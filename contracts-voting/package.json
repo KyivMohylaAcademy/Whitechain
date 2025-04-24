@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "compile": "hardhat compile",
+    "deploy:registry:sepolia": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network sepolia",
+    "deploy:registry:whitenet-testnet": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network whitechainTestnet"
   },
   "keywords": [],
   "author": "",
