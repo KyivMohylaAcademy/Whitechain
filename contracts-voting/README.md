@@ -11,3 +11,8 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Lock.ts
 ```
+
+# Descisions made:
+
+- Any single voting is represented by an id (just like tokens in ERC1151)
+- Removing a voting for a voting contract should keep the voting array's order
