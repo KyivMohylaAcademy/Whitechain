@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
-    "test:coverage": "hardhat coverage",
+    "test:coverage": "SOLIDITY_COVERAGE=true hardhat coverage",
     "compile": "hardhat compile",
     "deploy:registry:sepolia": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network sepolia",
     "deploy:registry:whitenet-testnet": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network whitechainTestnet"
