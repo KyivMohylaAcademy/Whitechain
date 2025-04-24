@@ -3,7 +3,7 @@
 
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-const LockModule = buildModule("VotingRegistryModule", (m) => {
+const VotingRegistryModule = buildModule("VotingRegistryModule", (m) => {
   const votingRegistry = m.contract("VotingRegistry");
 
   return {
@@ -11,4 +11,4 @@ const LockModule = buildModule("VotingRegistryModule", (m) => {
   }
 });
 
-export default LockModule;
+export default VotingRegistryModule;
