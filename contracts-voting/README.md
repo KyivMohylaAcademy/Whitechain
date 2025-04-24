@@ -7,7 +7,7 @@
 
 ## `VotingRegistry`
 
-For both `sepolia` and `whitenet-testnet` `VotingRegistry` is placed on same address:
+For both `sepolia` and `whitenet-testnet` `VotingRegistry` are placed on same address:
 
 ```
 0xaF94c252Ac8C2dABbe7D637af75EcEFb927bBFD8
