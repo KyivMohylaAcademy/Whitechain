@@ -3,6 +3,16 @@
 - Any single voting is represented by an id (just like tokens in ERC1151)
 - Removing a voting for a voting contract should keep the voting array's order
 
+# Deployed contract addresses
+
+## `VotingRegistry`
+
+For both `sepolia` and `whitenet-testnet` `VotingRegistry` is placed on same address:
+
+```
+0xaF94c252Ac8C2dABbe7D637af75EcEFb927bBFD8
+```
+
 # Deployment
 
 Hardhat ignition is used for deployments
