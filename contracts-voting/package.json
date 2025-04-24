@@ -8,7 +8,9 @@
     "test:coverage": "SOLIDITY_COVERAGE=true hardhat coverage",
     "compile": "hardhat compile",
     "deploy:registry:sepolia": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network sepolia",
-    "deploy:registry:whitenet-testnet": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network whitechainTestnet"
+    "deploy:registry:whitenet-testnet": "hardhat ignition deploy ./ignition/modules/VotingRegistry.ts --network whitechainTestnet",
+    "deploy:voting:sepolia": "hardhat ignition deploy ./ignition/modules/Voting.ts --network sepolia",
+    "deploy:voting:whitenet-testnet": "hardhat ignition deploy ./ignition/modules/Voting.ts --network whitechainTestnet"
   },
   "keywords": [],
   "author": "",

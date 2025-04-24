@@ -1,3 +1,6 @@
 {
-  "VotingRegistryModule#VotingRegistry": "0xaF94c252Ac8C2dABbe7D637af75EcEFb927bBFD8"
+  "VotingModule#ERC20VotingToken": "0xdA458cA8269Af986063AA3FC994Dbb2EbA2426C2",
+  "VotingRegistryModule#VotingRegistry": "0x77c1e3BFc1d0E20223783dc20787Ed62E32C631B",
+  "VotingModule#ERC20VotingTokenMarketplace": "0xC7049338508ae516743F3Fa9bEE5b0F6227d3bac",
+  "VotingModule#VotingContract": "0x5478d0675DE6A01c2194968219B9468148dDbC39"
 }

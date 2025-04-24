@@ -23,7 +23,7 @@ const config: HardhatUserConfig = {
     sepolia: INFURA_API_KEY && SEPOLIA_PRIVATE_KEY ? {
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [SEPOLIA_PRIVATE_KEY],
-      gasPrice: 10,
+      gasPrice: 3,
     } : undefined,
     whitechainTestnet: WHITECHAIN_TESTNET_PRIVATE_KEY ? {
       url: "https://rpc-testnet.whitechain.io",
