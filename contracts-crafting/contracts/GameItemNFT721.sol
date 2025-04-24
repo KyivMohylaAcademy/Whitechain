@@ -51,10 +51,8 @@ contract GameItemNFT721 is ERC721URIStorage, AccessControl {
       return "staff";
     } else if (tokenItemType == ARMOR) {
       return "armor";
-    } else if (tokenItemType == BRACELET) {
-      return "bracelet";
-    } else {
-      revert InvalidTokenItemType(tokenItemType);
     }
+
+    return "bracelet";
   }
 }
