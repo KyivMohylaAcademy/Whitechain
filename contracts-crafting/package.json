@@ -1,10 +1,12 @@
 {
-  "name": "contracts-voting",
+  "name": "contracts-crafting",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "hardhat test",
+    "test:coverage": "SOLIDITY_COVERAGE=true hardhat coverage",
+    "compile": "hardhat compile"
   },
   "keywords": [],
   "author": "",
@@ -28,5 +30,8 @@
     "ts-node": ">=8.0.0",
     "typescript": "~5.0.4",
     "viem": "^2.7.6"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.3.0"
   }
 }
