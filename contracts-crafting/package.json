@@ -6,7 +6,9 @@
   "scripts": {
     "test": "hardhat test",
     "test:coverage": "SOLIDITY_COVERAGE=true hardhat coverage",
-    "compile": "hardhat compile"
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat ignition deploy ./ignition/modules/Crafting.ts --network sepolia",
+    "deploy:whitenet-testnet": "hardhat ignition deploy ./ignition/modules/Crafting.ts --network whitechainTestnet"
   },
   "keywords": [],
   "author": "",
