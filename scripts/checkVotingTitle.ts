@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-    const votingAddress = "0xda452E37256009f69291B6B414A9f4e234BCCcdc";
+    const votingAddress = "0x4d4095a559efbA88B1390bA47C2D247D0Eb30B73";
     const Voting = await ethers.getContractAt("VotingContractNFT", votingAddress);
 
     const votingId = 0;

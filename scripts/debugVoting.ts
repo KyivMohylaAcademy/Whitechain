@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
 
 async function main() {
-    const votingAddress = "0xda452E37256009f69291B6B414A9f4e234BCCcdc";
-    const nftAddress = "0x2bC6F7E733152cA67C8acA82783cFd41e618e72D";
+    const votingAddress = "0x4d4095a559efbA88B1390bA47C2D247D0Eb30B73";
+    const nftAddress = "0xf574b1CF543138589e2530654F7e35A96c7a55bC";
 
     const Voting = await ethers.getContractAt("VotingContractNFT", votingAddress);
     const NFT = await ethers.getContractAt("MyVotingNFT", nftAddress);
@@ -13,7 +13,7 @@ async function main() {
     const votingCount = await Voting.votingCount();
     console.log("🧾 Кількість голосувань:", votingCount.toString());
 
-    const votingId = 1; // або 0
+    const votingId = 0; // або 0
 
     const [title, active, endTime, optionsCount] = await Voting.getVotingDetails(votingId);
     const balance = await NFT.balanceOf(addr);

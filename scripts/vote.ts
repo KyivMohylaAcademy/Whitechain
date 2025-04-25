@@ -1,10 +1,11 @@
 import { ethers } from "hardhat";
 
 async function main() {
-    const votingContractAddress = "0xf574b1CF543138589e2530654F7e35A96c7a55bC";
-    const Voting = await ethers.getContractAt("VotingContractNFT", votingContractAddress);
+    const votingContractAddress = "0x4d4095a559efbA88B1390bA47C2D247D0Eb30B73";
+    const signer = (await ethers.getSigners())[0];
+    const Voting = await ethers.getContractAt("VotingContractNFT", votingContractAddress, signer);
 
-    const votingId = 0; // ← Тепер точно правильний!
+    const votingId = 0;
     const optionId = 1; // Наприклад, "Суші"
 
     const tx = await Voting.vote(votingId, optionId);
