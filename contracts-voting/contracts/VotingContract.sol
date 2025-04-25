@@ -6,7 +6,7 @@ import "./ERC20VotingToken.sol";
 import "./VotingRegistry.sol";
 
 /// @title Voting Contract
-/// @author Your Name or Organization
+/// @author Artem Tarasenko (@shabashab)
 /// @notice Enables creation and participation in on-chain votings with ERC20-based eligibility and registry verification
 /// @dev Only registered contracts in VotingRegistry can create and run votings. Each voting requires a minimum token balance.
 contract VotingContract is Ownable {
