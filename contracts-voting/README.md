@@ -48,9 +48,8 @@ The mechanism chosen for this submission uses **minimum amount of ERC20 tokens t
 - `ERC20VotingTokenMarketplace` - `0x77c1e3BFc1d0E20223783dc20787Ed62E32C631B`
 - `VotingContract` - `0xC7049338508ae516743F3Fa9bEE5b0F6227d3bac`
 
-
 #### Whitechain testnet
-****
+
 - `VotingRegistry` - `0x77c1e3BFc1d0E20223783dc20787Ed62E32C631B`
 - `ERC20VotingToken` - `0xdA458cA8269Af986063AA3FC994Dbb2EbA2426C2`
 - `ERC20VotingTokenMarketplace` - `0xC7049338508ae516743F3Fa9bEE5b0F6227d3bac`
