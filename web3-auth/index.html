@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Authorization</title>
+    <style>
+        /* Basic reset and full-page layout */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f4f8;
+        }
+
+        /* Styling for the container */
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            max-width: 100%;
+        }
+
+        /* Button styling */
+        #connectWallet {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 32px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #connectWallet:hover {
+            background-color: #45a049;
+        }
+
+        /* Styling for the wallet address display */
+        #walletAddress {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            word-wrap: break-word;
+        }
+
+        /* Styling for error message */
+        .error {
+            color: red;
+        }
+
+        /* Styling for success message */
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="connectWallet">Увійти через Web3</button>
+        <div id="walletAddress"></div>
+    </div>
+
+    <!-- Web3.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    
+    <!-- Web3 Authorization Script -->
+    <script>
+        const connectButton = document.getElementById('connectWallet');
+        const walletAddressDiv = document.getElementById('walletAddress');
+
+        const handleWeb3Connection = async () => {
+            if (window.ethereum) {
+                try {
+                    // Request account access
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    // Web3 instance
+                    const web3 = new Web3(window.ethereum);
+
+                    // Display the connected address
+                    const account = accounts[0];
+                    walletAddressDiv.textContent = `Connected wallet: ${account}`;
+                    walletAddressDiv.classList.remove('error');
+                    walletAddressDiv.classList.add('success');
+                } catch (error) {
+                    walletAddressDiv.textContent = 'Error connecting to wallet: ' + (error instanceof Error ? error.message : 'Unknown error');
+                    walletAddressDiv.classList.remove('success');
+                    walletAddressDiv.classList.add('error');
+                }
+            } else {
+                walletAddressDiv.textContent = 'No Web3 wallet detected. Please install MetaMask.';
+                walletAddressDiv.classList.remove('success');
+                walletAddressDiv.classList.add('error');
+            }
+        };
+
+        // Event listener for the connect button
+        connectButton.addEventListener('click', handleWeb3Connection);
+    </script>
+</body>
+</html>
