@@ -15,7 +15,7 @@ let signer;
 
 async function connectWallet() {
     if (!window.ethereum) {
-        alert("Встанови MetaMask!");
+        alert("Install MetaMask!");
         return;
     }
 
@@ -23,7 +23,7 @@ async function connectWallet() {
     await provider.send("eth_requestAccounts", []);
     signer = provider.getSigner();
     const address = await signer.getAddress();
-    document.getElementById("walletAddress").innerText = `Підключено: ${address}`;
+    document.getElementById("walletAddress").innerText = `Connected: ${address}`;
 
     await fetchProposals();
 }
@@ -36,9 +36,9 @@ async function buyTokens() {
     try {
         const tx = await contract.buyTokens({ value: ethers.utils.parseEther(ethAmount) });
         await tx.wait();
-        alert("Успішно куплено токени!");
+        alert("Tokens successfully purchased!");
     } catch (e) {
-        alert("Помилка при купівлі: " + e.message);
+        alert("Error when purchasing: " + e.message);
     }
 }
 
@@ -52,7 +52,7 @@ async function fetchProposals() {
     ul.innerHTML = "";
     proposals.forEach((proposal, index) => {
         const li = document.createElement("li");
-        li.innerText = `#${index} - ${proposal.description} [${proposal.votes} голосів]`;
+        li.innerText = `#${index} - ${proposal.description} [${proposal.votes} votes]`;
         ul.appendChild(li);
     });
 }
@@ -63,10 +63,10 @@ async function vote() {
     try {
         const tx = await contract.vote(index);
         await tx.wait();
-        alert("Голос зараховано!");
+        alert("Vote counted!");
         await fetchProposals();
     } catch (e) {
-        alert("Не вдалося проголосувати: " + e.message);
+        alert("Failed to vote: " + e.message);
     }
 }
 
