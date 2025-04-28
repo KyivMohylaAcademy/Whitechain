@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Web3 Voting DApp</title>
+</head>
+<body>
+<h1>Web3 ERC20 Voting</h1>
+
+<button onclick="connectWallet()">🔑 Sign in with MetaMask</button>
+<p id="walletAddress"></p>
+
+<hr/>
+
+<h3>🪙 Купити VOTE токени</h3>
+<input id="ethAmount" type="text" placeholder="ETH кількість"/>
+<button onclick="buyTokens()">Купити</button>
+
+<hr/>
+
+<h3>📋 Пропозиції</h3>
+<ul id="proposalList"></ul>
+
+<hr/>
+
+<h3>🗳️ Проголосувати</h3>
+<input id="proposalIndex" type="number" placeholder="Індекс пропозиції"/>
+<button onclick="vote()">Голосувати</button>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="main.js" type="module"></script>
+</body>
+</html>
