@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система голосування WhiteBIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .container {
+            display: flex;
+            gap: 30px;
+        }
+        .sidebar {
+            width: 300px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .field {
+            margin-bottom: 15px;
+        }
+        .field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field input, .field textarea, .field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .field textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .voting-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .voting-item:last-child {
+            border-bottom: none;
+        }
+        .hidden {
+            display: none;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 2px;
+        }
+        .tab-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Система голосування WhiteBIT</h1>
+    
+    <!-- Верхня панель з інформацією про підключення -->
+    <div class="status info" id="connection-info">
+        <p>Статус: <span id="connection-status">Не підключено</span></p>
+        <p>Адреса гаманця: <span id="wallet-address">-</span></p>
+        <p>Баланс токенів: <span id="token-balance">-</span> WBVT</p>
+        <p>Мережа: <span id="network-name">-</span></p>
+        <button class="btn" id="connect-button">Підключити гаманець</button>
+    </div>
+    
+    <div class="container">
+        <!-- Ліва панель -->
+        <div class="sidebar">
+            <h2>Навігація</h2>
+            <button class="btn" id="btn-votings">Голосування</button>
+            <button class="btn" id="btn-tokens">Токени</button>
+            <button class="btn" id="btn-create-voting" disabled>Створити голосування</button>
+            
+            <h3>Інформація про контракти</h3>
+            <p><strong>VotingRegistry:</strong> <span id="voting-registry-address">-</span></p>
+            <p><strong>VotingContract:</strong> <span id="voting-contract-address">-</span></p>
+            <p><strong>ERC20VotingToken:</strong> <span id="token-address">-</span></p>
+            <p><strong>Marketplace:</strong> <span id="marketplace-address">-</span></p>
+        </div>
+        
+        <!-- Основний вміст -->
+        <div class="content">
+            <!-- Вкладки -->
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="tab-votings">Активні голосування</button>
+                <button class="tab-button" data-tab="tab-tokens">Купівля/Продаж токенів</button>
+                <button class="tab-button" data-tab="tab-create">Створити голосування</button>
+            </div>
+            
+            <!-- Вкладка з голосуваннями -->
+            <div id="tab-votings" class="tab-content active">
+                <h2>Доступні голосування</h2>
+                <div id="votings-list">
+                    <p>Підключіть гаманець для перегляду голосувань.</p>
+                </div>
+            </div>
+            
+            <!-- Вкладка з токенами -->
+            <div id="tab-tokens" class="tab-content">
+                <h2>Купівля і продаж токенів</h2>
+                
+                <div class="field">
+                    <label for="buy-amount">Кількість токенів для купівлі:</label>
+                    <input type="number" id="buy-amount" min="1" value="10">
+                </div>
+                <div class="status info">
+                    <p>Вартість: <span id="buy-cost">-</span> ETH</p>
+                </div>
+                <button class="btn" id="buy-tokens-button" disabled>Купити токени</button>
+                
+                <hr>
+                
+                <div class="field">
+                    <label for="sell-amount">Кількість токенів для продажу:</label>
+                    <input type="number" id="sell-amount" min="1" value="5">
+                </div>
+                <div class="status info">
+                    <p>Отримаєте: <span id="sell-value">-</span> ETH</p>
+                </div>
+                <button class="btn" id="sell-tokens-button" disabled>Продати токени</button>
+            </div>
+            
+            <!-- Вкладка створення голосування -->
+            <div id="tab-create" class="tab-content">
+                <h2>Створення нового голосування</h2>
+                
+                <div class="field">
+                    <label for="voting-title">Назва голосування:</label>
+                    <input type="text" id="voting-title" placeholder="Введіть назву">
+                </div>
+                
+                <div class="field">
+                    <label for="voting-description">Опис голосування:</label>
+                    <textarea id="voting-description" placeholder="Введіть опис"></textarea>
+                </div>
+                
+                <div class="field">
+                    <label for="voting-options">Кількість варіантів:</label>
+                    <input type="number" id="voting-options" min="2" value="2">
+                </div>
+                
+                <div class="field">
+                    <label for="voting-duration">Тривалість (години):</label>
+                    <input type="number" id="voting-duration" min="1" value="24">
+                </div>
+                
+                <div class="field">
+                    <label for="voting-reward">Винагорода (токени):</label>
+                    <input type="number" id="voting-reward" min="1" value="1">
+                </div>
+                
+                <button class="btn" id="create-voting-button" disabled>Створити голосування</button>
+            </div>
+            
+            <!-- Вкладка з деталями голосування -->
+            <div id="tab-voting-details" class="tab-content">
+                <button class="btn" id="back-to-votings">Назад до списку</button>
+                
+                <h2 id="voting-detail-title">Деталі голосування</h2>
+                <p id="voting-detail-description"></p>
+                
+                <div class="status info">
+                    <p>Починається: <span id="voting-start-time">-</span></p>
+                    <p>Закінчується: <span id="voting-end-time">-</span></p>
+                    <p>Статус: <span id="voting-status">-</span></p>
+                    <p>Кількість варіантів: <span id="voting-options-count">-</span></p>
+                    <p>Винагорода: <span id="voting-reward">-</span> WBVT</p>
+                </div>
+                
+                <h3>Віддати голос</h3>
+                <div id="voting-options-container" class="field">
+                    <label for="voting-option">Оберіть варіант:</label>
+                    <select id="voting-option"></select>
+                </div>
+                
+                <button class="btn" id="vote-button" disabled>Проголосувати</button>
+                
+                <h3>Результати</h3>
+                <div id="voting-results">
+                    <p>Результати будуть доступні після закінчення голосування.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальне вікно для повідомлень -->
+    <div id="modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div style="background-color: white; padding: 20px; border-radius: 8px; max-width: 80%;">
+            <h3 id="modal-title">Повідомлення</h3>
+            <p id="modal-content">Текст повідомлення</p>
+            <button class="btn" id="modal-close">Закрити</button>
+        </div>
+    </div>
+
+    <!-- Підключення Web3 і скриптів -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script>
+        // Адреси контрактів (замініть на свої після розгортання)
+        const CONTRACT_ADDRESSES = {
+            votingRegistry: "0xA2A664898A5d1C2f073494f3331Dc14d0eb5202F",
+            votingContract: "0x6E3EBdd7f53141d910DeC5264257b0F10Cd14E22",
+            erc20Token: "0xc7f28950c5eE4b9b8B27dB1538803fcE4D620AD2",
+            marketplace: "0xa917948b20185AFEb998Fcb4546B6a42199F4E1C"
+        };
+
+        // ABI контрактів (скорочені версії для прикладу)
+        const VOTING_CONTRACT_ABI = [
+            "function getVotingInfo(uint256 _votingId) external view returns (string memory title, string memory description, uint256 startTime, uint256 endTime, uint256 optionsCount, bool isActive)",
+            "function vote(uint256 _votingId, uint256 _option) external",
+            "function hasVoted(uint256 _votingId, address _voter) external view returns (bool)",
+            "function getVotesForOption(uint256 _votingId, uint256 _option) external view returns (uint256)",
+            "function getWinner(uint256 _votingId) external view returns (uint256)",
+            "function createVoting(string memory _title, string memory _description, uint256 _startTime, uint256 _endTime, uint256 _optionsCount, uint256 _rewardAmount) external returns (uint256)",
+            "event VotingCreated(uint256 indexed votingId, string title, uint256 startTime, uint256 endTime)"
+        ];
+
+        const TOKEN_ABI = [
+            "function balanceOf(address account) external view returns (uint256)",
+            "function approve(address spender, uint256 amount) external returns (bool)"
+        ];
+
+        const MARKETPLACE_ABI = [
+            "function buyTokens(uint256 _amount) external payable",
+            "function sellTokens(uint256 _amount) external",
+            "function tokenPrice() external view returns (uint256)"
+        ];
+
+        const VOTING_REGISTRY_ABI = [
+            "function addVotingContract(address _contractAddress) external",
+            "function getContractVotings(address _contractAddress) external view returns (uint256[] memory)"
+        ];
+
+        // Змінні для збереження екземплярів контрактів
+        let provider;
+        let signer;
+        let votingContract;
+        let tokenContract;
+        let marketplaceContract;
+        let votingRegistryContract;
+        let currentAccount;
+        let tokenPrice;
+        let currentVotingId;
+
+        // Ініціалізація сторінки після завантаження
+        document.addEventListener('DOMContentLoaded', function() {
+            // Встановлення обробників подій для вкладок
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Приховування всіх вкладок
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    
+                    // Деактивація всіх кнопок
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Активація вибраної вкладки і кнопки
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    this.classList.add('active');
+                });
+            });
+            
+            // Обробник для кнопки підключення
+            document.getElementById('connect-button').addEventListener('click', connectWallet);
+            
+            // Обробник для кнопки купівлі токенів
+            document.getElementById('buy-tokens-button').addEventListener('click', buyTokens);
+            
+            // Обробник для кнопки продажу токенів
+            document.getElementById('sell-tokens-button').addEventListener('click', sellTokens);
+            
+            // Обробник для кнопки створення голосування
+            document.getElementById('create-voting-button').addEventListener('click', createVoting);
+            
+            // Обробник для кнопки голосування
+            document.getElementById('vote-button').addEventListener('click', vote);
+            
+            // Обробник для кнопки повернення до списку голосувань
+            document.getElementById('back-to-votings').addEventListener('click', function() {
+                document.getElementById('tab-voting-details').classList.remove('active');
+                document.getElementById('tab-votings').classList.add('active');
+            });
+            
+            // Обробник для закриття модального вікна
+            document.getElementById('modal-close').addEventListener('click', function() {
+                document.getElementById('modal').classList.add('hidden');
+            });
+            
+            // Обробники для полів введення кількості токенів
+            document.getElementById('buy-amount').addEventListener('input', updateBuyCost);
+            document.getElementById('sell-amount').addEventListener('input', updateSellValue);
+            
+            // Навігація по кнопкам в лівому меню
+            document.getElementById('btn-votings').addEventListener('click', function() {
+                activateTab('tab-votings');
+            });
+            
+            document.getElementById('btn-tokens').addEventListener('click', function() {
+                activateTab('tab-tokens');
+            });
+            
+            document.getElementById('btn-create-voting').addEventListener('click', function() {
+                activateTab('tab-create');
+            });
+            
+            // Перевірка наявності MetaMask
+            checkMetaMask();
+        });
+
+        // Функція для активації вкладки
+        function activateTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        // Функція для перевірки наявності MetaMask
+        function checkMetaMask() {
+            if (window.ethereum) {
+                document.getElementById('connection-status').textContent = 'MetaMask знайдено. Натисніть "Підключити гаманець".';
+            } else {
+                document.getElementById('connection-status').textContent = 'MetaMask не знайдено. Будь ласка, встановіть розширення.';
+                document.getElementById('connect-button').disabled = true;
+                showModal('Помилка', 'MetaMask не знайдено. Будь ласка, встановіть розширення MetaMask для роботи з додатком.');
+            }
+        }
+
+        // Функція для підключення гаманця
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    throw new Error('MetaMask не знайдено!');
+                }
+                
+                // Підключення до гаманця
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                currentAccount = accounts[0];
+                
+                // Створення провайдера і підписувача
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                
+                // Отримання інформації про мережу
+                const network = await provider.getNetwork();
+                document.getElementById('network-name').textContent = network.name;
+                
+                // Створення екземплярів контрактів
+                votingContract = new ethers.Contract(CONTRACT_ADDRESSES.votingContract, VOTING_CONTRACT_ABI, signer);
+                tokenContract = new ethers.Contract(CONTRACT_ADDRESSES.erc20Token, TOKEN_ABI, signer);
+                marketplaceContract = new ethers.Contract(CONTRACT_ADDRESSES.marketplace, MARKETPLACE_ABI, signer);
+                votingRegistryContract = new ethers.Contract(CONTRACT_ADDRESSES.votingRegistry, VOTING_REGISTRY_ABI, signer);
+                
+                // Оновлення інформації в інтерфейсі
+                document.getElementById('wallet-address').textContent = currentAccount;
+                document.getElementById('connection-status').textContent = 'Підключено';
+                document.getElementById('connect-button').textContent = 'Оновити дані';
+                
+                // Оновлення адрес контрактів
+                document.getElementById('voting-registry-address').textContent = CONTRACT_ADDRESSES.votingRegistry;
+                document.getElementById('voting-contract-address').textContent = CONTRACT_ADDRESSES.votingContract;
+                document.getElementById('token-address').textContent = CONTRACT_ADDRESSES.erc20Token;
+                document.getElementById('marketplace-address').textContent = CONTRACT_ADDRESSES.marketplace;
+                
+                // Активація функціональності
+                document.getElementById('buy-tokens-button').disabled = false;
+                document.getElementById('sell-tokens-button').disabled = false;
+                document.getElementById('create-voting-button').disabled = false;
+                document.getElementById('btn-create-voting').disabled = false;
+                
+                // Отримання балансу токенів
+                updateTokenBalance();
+                
+                // Отримання ціни токенів
+                tokenPrice = await marketplaceContract.tokenPrice();
+                
+                // Оновлення розрахунків вартості
+                updateBuyCost();
+                updateSellValue();
+                
+                // Завантаження списку голосувань
+                loadVotings();
+                
+                // Підписка на події зміни гаманця
+                window.ethereum.on('accountsChanged', function (accounts) {
+                    window.location.reload();
+                });
+                
+                // Підписка на події зміни мережі
+                window.ethereum.on('chainChanged', function (chainId) {
+                    window.location.reload();
+                });
+            } catch (error) {
+                console.error('Помилка підключення:', error);
+                showModal('Помилка підключення', `Не вдалося підключитися до гаманця: ${error.message}`);
+            }
+        }
+
+        // Функція для оновлення балансу токенів
+        async function updateTokenBalance() {
+            try {
+                if (!tokenContract || !currentAccount) return;
+                
+                const balance = await tokenContract.balanceOf(currentAccount);
+                document.getElementById('token-balance').textContent = ethers.utils.formatUnits(balance, 18);
+            } catch (error) {
+                console.error('Помилка оновлення балансу:', error);
+            }
+        }
+
+        // Функція для оновлення вартості купівлі токенів
+        function updateBuyCost() {
+            try {
+                if (!tokenPrice) return;
+                
+                const amount = document.getElementById('buy-amount').value || 0;
+                const weiAmount = ethers.utils.parseUnits(amount.toString(), 18);
+                const cost = weiAmount.mul(tokenPrice).div(ethers.utils.parseUnits('1', 18));
+                
+                document.getElementById('buy-cost').textContent = ethers.utils.formatEther(cost);
+            } catch (error) {
+                console.error('Помилка розрахунку вартості:', error);
+            }
+        }
+
+        // Функція для оновлення вартості продажу токенів
+        function updateSellValue() {
+            try {
+                if (!tokenPrice) return;
+                
+                const amount = document.getElementById('sell-amount').value || 0;
+                const weiAmount = ethers.utils.parseUnits(amount.toString(), 18);
+                const value = weiAmount.mul(tokenPrice).div(ethers.utils.parseUnits('1', 18));
+                
+                document.getElementById('sell-value').textContent = ethers.utils.formatEther(value);
+            } catch (error) {
+                console.error('Помилка розрахунку вартості:', error);
+            }
+        }
+
+        // Функція для купівлі токенів
+        async function buyTokens() {
+            try {
+                if (!marketplaceContract) {
+                    throw new Error('Контракт не ініціалізовано!');
+                }
+                
+                const amount = document.getElementById('buy-amount').value;
+                if (!amount || amount <= 0) {
+                    throw new Error('Введіть коректну кількість токенів!');
+                }
+                
+                const weiAmount = ethers.utils.parseUnits(amount, 18);
+                const cost = weiAmount.mul(tokenPrice).div(ethers.utils.parseUnits('1', 18));
+                
+                // Купівля токенів
+                const tx = await marketplaceContract.buyTokens(weiAmount, { value: cost });
+                showModal('Транзакція відправлена', `Купівля токенів в процесі. Хеш транзакції: ${tx.hash}`);
+                
+                // Очікування підтвердження транзакції
+                await tx.wait();
+                
+                // Оновлення балансу
+                await updateTokenBalance();
+                
+                showModal('Успіх', `Ви успішно купили ${amount} токенів!`);
+            } catch (error) {
+                console.error('Помилка купівлі токенів:', error);
+                showModal('Помилка', `Не вдалося купити токени: ${error.message}`);
+            }
+        }
+
+        // Функція для продажу токенів
+        async function sellTokens() {
+            try {
+                if (!marketplaceContract || !tokenContract) {
+                    throw new Error('Контракти не ініціалізовано!');
+                }
+                
+                const amount = document.getElementById('sell-amount').value;
+                if (!amount || amount <= 0) {
+                    throw new Error('Введіть коректну кількість токенів!');
+                }
+                
+                const weiAmount = ethers.utils.parseUnits(amount, 18);
+                
+                // Перевірка балансу
+                const balance = await tokenContract.balanceOf(currentAccount);
+                if (balance.lt(weiAmount)) {
+                    throw new Error(`Недостатньо токенів! Ваш баланс: ${ethers.utils.formatUnits(balance, 18)}`);
+                }
+                
+                // Надання дозволу на переказ токенів
+                const approveTx = await tokenContract.approve(CONTRACT_ADDRESSES.marketplace, weiAmount);
+                showModal('Транзакція відправлена', `Надання дозволу на переказ токенів. Хеш транзакції: ${approveTx.hash}`);
+                await approveTx.wait();
+                
+                // Продаж токенів
+                const tx = await marketplaceContract.sellTokens(weiAmount);
+                showModal('Транзакція відправлена', `Продаж токенів в процесі. Хеш транзакції: ${tx.hash}`);
+                
+                // Очікування підтвердження транзакції
+                await tx.wait();
+                
+                // Оновлення балансу
+                await updateTokenBalance();
+                
+                showModal('Успіх', `Ви успішно продали ${amount} токенів!`);
+            } catch (error) {
+                console.error('Помилка продажу токенів:', error);
+                showModal('Помилка', `Не вдалося продати токени: ${error.message}`);
+            }
+        }
+
+        // Функція для створення голосування
+        async function createVoting() {
+            try {
+                if (!votingContract) {
+                    throw new Error('Контракт не ініціалізовано!');
+                }
+                
+                const title = document.getElementById('voting-title').value;
+                if (!title) {
+                    throw new Error('Введіть назву голосування!');
+                }
+                
+                const description = document.getElementById('voting-description').value;
+                if (!description) {
+                    throw new Error('Введіть опис голосування!');
+                }
+                
+                const optionsCount = parseInt(document.getElementById('voting-options').value);
+                if (optionsCount < 2) {
+                    throw new Error('Кількість варіантів повинна бути не менше 2!');
+                }
+                
+                const durationHours = parseInt(document.getElementById('voting-duration').value);
+                if (durationHours < 1) {
+                    throw new Error('Тривалість повинна бути не менше 1 години!');
+                }
+                
+                const reward = parseFloat(document.getElementById('voting-reward').value);
+                if (reward <= 0) {
+                    throw new Error('Винагорода повинна бути більше 0!');
+                }
+                
+                // Розрахунок часу початку і кінця голосування
+                const now = Math.floor(Date.now() / 1000);
+                const startTime = now + 60; // Початок через 1 хвилину
+                const endTime = startTime + (durationHours * 3600); // Кінець через вказану кількість годин
+                
+                // Конвертація винагороди в wei
+                const rewardWei = ethers.utils.parseUnits(reward.toString(), 18);
+                
+                // Створення голосування
+                const tx = await votingContract.createVoting(
+                    title,
+                    description,
+                    startTime,
+                    endTime,
+                    optionsCount,
+                    rewardWei
+                );
+                
+                showModal('Транзакція відправлена', `Створення голосування в процесі. Хеш транзакції: ${tx.hash}`);
+                
+                // Очікування підтвердження транзакції
+                const receipt = await tx.wait();
+                
+                // Отримання ID нового голосування з події
+                const event = receipt.events.find(event => event.event === 'VotingCreated');
+                const votingId = event.args.votingId.toNumber();
+                
+                showModal('Успіх', `Голосування успішно створено з ID: ${votingId}`);
+                
+                // Очищення форми
+                document.getElementById('voting-title').value = '';
+                document.getElementById('voting-description').value = '';
+                
+                // Оновлення списку голосувань
+                loadVotings();
+                
+                // Перехід на вкладку зі списком голосувань
+                activateTab('tab-votings');
+            } catch (error) {
+                console.error('Помилка створення голосування:', error);
+                showModal('Помилка', `Не вдалося створити голосування: ${error.message}`);
+            }
+        }
+
+        // Функція для завантаження списку голосувань
+        async function loadVotings() {
+            try {
+                if (!votingRegistryContract || !votingContract) {
+                    return;
+                }
+                
+                // Отримання списку голосувань з реєстру
+                const votings = await votingRegistryContract.getContractVotings(CONTRACT_ADDRESSES.votingContract);
+                
+                const votingsList = document.getElementById('votings-list');
+                
+                if (votings.length === 0) {
+                    votingsList.innerHTML = '<p>Немає доступних голосувань.</p>';
+                    return;
+                }
+                
+                let html = '';
+                
+                // Створення елементів для кожного голосування
+                for (let i = 0; i < votings.length; i++) {
+                    const votingId = votings[i].toNumber();
+                    
+                    // Отримання інформації про голосування
+                    const info = await votingContract.getVotingInfo(votingId);
+                    const title = info[0];
+                    const startTime = new Date(info[2].toNumber() * 1000).toLocaleString();
+                    const endTime = new Date(info[3].toNumber() * 1000).toLocaleString();
+                    const isActive = info[5];
+                    
+                    if (!isActive) continue; // Пропускаємо неактивні голосування
+                    
+                    html += `
+                    <div class="voting-item">
+                        <h3>${title}</h3>
+                        <p>Початок: ${startTime}</p>
+                        <p>Закінчення: ${endTime}</p>
+                        <button class="btn" onclick="showVotingDetails(${votingId})">Детальніше</button>
+                    </div>
+                    `;
+                }
+                
+                if (html === '') {
+                    votingsList.innerHTML = '<p>Немає активних голосувань.</p>';
+                } else {
+                    votingsList.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Помилка завантаження голосувань:', error);
+                document.getElementById('votings-list').innerHTML = `<p>Помилка завантаження голосувань: ${error.message}</p>`;
+            }
+        }
+
+        // Функція для відображення деталей голосування
+        async function showVotingDetails(votingId) {
+            try {
+                if (!votingContract) {
+                    throw new Error('Контракт не ініціалізовано!');
+                }
+                
+                currentVotingId = votingId;
+                
+                // Отримання інформації про голосування
+                const info = await votingContract.getVotingInfo(votingId);
+                const title = info[0];
+                const description = info[1];
+                const startTime = info[2].toNumber();
+                const endTime = info[3].toNumber();
+                const optionsCount = info[4].toNumber();
+                const isActive = info[5];
+                
+                // Відображення інформації
+                document.getElementById('voting-detail-title').textContent = title;
+                document.getElementById('voting-detail-description').textContent = description;
+                document.getElementById('voting-start-time').textContent = new Date(startTime * 1000).toLocaleString();
+                document.getElementById('voting-end-time').textContent = new Date(endTime * 1000).toLocaleString();
+                document.getElementById('voting-options-count').textContent = optionsCount;
+                
+                // Визначення статусу голосування
+                const now = Math.floor(Date.now() / 1000);
+                let status = '';
+                
+                if (!isActive) {
+                    status = 'Закрито';
+                } else if (now < startTime) {
+                    status = 'Ще не почалося';
+                } else if (now > endTime) {
+                    status = 'Завершено';
+                } else {
+                    status = 'Активне';
+                }
+                
+                document.getElementById('voting-status').textContent = status;
+                
+                // Заповнення списку варіантів для голосування
+                const optionSelect = document.getElementById('voting-option');
+                optionSelect.innerHTML = '';
+                
+                for (let i = 0; i < optionsCount; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `Варіант ${i + 1}`;
+                    optionSelect.appendChild(option);
+                }
+                
+                // Перевірка, чи може користувач голосувати
+                let canVote = false;
+                
+                if (isActive && now >= startTime && now <= endTime) {
+                    const hasVoted = await votingContract.hasVoted(votingId, currentAccount);
+                    canVote = !hasVoted;
+                }
+                
+                document.getElementById('vote-button').disabled = !canVote;
+                
+                // Завантаження результатів голосування
+                await loadVotingResults(votingId);
+                
+                // Показ вкладки з деталями
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.getElementById('tab-voting-details').classList.add('active');
+            } catch (error) {
+                console.error('Помилка завантаження деталей голосування:', error);
+                showModal('Помилка', `Не вдалося завантажити деталі голосування: ${error.message}`);
+            }
+        }
+
+        // Функція для завантаження результатів голосування
+        async function loadVotingResults(votingId) {
+            try {
+                if (!votingContract) {
+                    throw new Error('Контракт не ініціалізовано!');
+                }
+                
+                // Отримання інформації про голосування
+                const info = await votingContract.getVotingInfo(votingId);
+                const endTime = info[3].toNumber();
+                const optionsCount = info[4].toNumber();
+                
+                const now = Math.floor(Date.now() / 1000);
+                const resultsContainer = document.getElementById('voting-results');
+                
+                if (now <= endTime) {
+                    resultsContainer.innerHTML = '<p>Результати будуть доступні після закінчення голосування.</p>';
+                    return;
+                }
+                
+                // Отримання результатів для кожного варіанту
+                let html = '<ul>';
+                
+                for (let i = 0; i < optionsCount; i++) {
+                    const votes = await votingContract.getVotesForOption(votingId, i);
+                    html += `<li>Варіант ${i + 1}: ${votes} голосів</li>`;
+                }
+                
+                html += '</ul>';
+                
+                // Отримання переможця
+                const winner = await votingContract.getWinner(votingId);
+                html += `<p><strong>Переможець: Варіант ${winner.toNumber() + 1}</strong></p>`;
+                
+                resultsContainer.innerHTML = html;
+            } catch (error) {
+                console.error('Помилка завантаження результатів:', error);
+                document.getElementById('voting-results').innerHTML = `<p>Помилка завантаження результатів: ${error.message}</p>`;
+            }
+        }
+
+        // Функція для голосування
+        async function vote() {
+            try {
+                if (!votingContract) {
+                    throw new Error('Контракт не ініціалізовано!');
+                }
+                
+                const option = parseInt(document.getElementById('voting-option').value);
+                
+                // Голосування
+                const tx = await votingContract.vote(currentVotingId, option);
+                showModal('Транзакція відправлена', `Голосування в процесі. Хеш транзакції: ${tx.hash}`);
+                
+                // Очікування підтвердження транзакції
+                await tx.wait();
+                
+                // Оновлення балансу токенів (отримання винагороди)
+                await updateTokenBalance();
+                
+                // Оновлення інформації про голосування
+                await showVotingDetails(currentVotingId);
+                
+                showModal('Успіх', `Ви успішно проголосували за варіант ${option + 1}!`);
+            } catch (error) {
+                console.error('Помилка голосування:', error);
+                showModal('Помилка', `Не вдалося проголосувати: ${error.message}`);
+            }
+        }
+
+        // Функція для відображення модального вікна
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').textContent = message;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        // Прив'язка функції showVotingDetails до глобального контексту для виклику з HTML
+        window.showVotingDetails = showVotingDetails;
+    </script>
+</body>
+</html>
