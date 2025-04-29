@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteBIT Voting Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        .voting-item {
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>WhiteBIT Voting Interface</h1>
+    
+    <div class="container">
+        <h2>Connect Wallet</h2>
+        <button id="connectWallet">Connect MetaMask</button>
+        <div id="walletInfo" class="status"></div>
+    </div>
+
+    <div class="container">
+        <h2>Contract Info</h2>
+        <div id="contractInfo">
+            <p>VotingRegistry: <span id="votingRegistryAddress"></span></p>
+            <p>ERC20VotingToken: <span id="tokenAddress"></span></p>
+            <p>Marketplace: <span id="marketplaceAddress"></span></p>
+            <p>VotingContract: <span id="votingContractAddress"></span></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Token Operations</h2>
+        <div>
+            <h3>Your Token Balance: <span id="tokenBalance">0</span></h3>
+            <div>
+                <label for="buyAmount">Amount to Buy:</label>
+                <input type="number" id="buyAmount" placeholder="Enter amount" min="1" value="10">
+                <button id="buyTokens">Buy Tokens</button>
+            </div>
+            <div>
+                <label for="sellAmount">Amount to Sell:</label>
+                <input type="number" id="sellAmount" placeholder="Enter amount" min="1" value="5">
+                <button id="sellTokens">Sell Tokens</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Voting Operations</h2>
+        <div>
+            <h3>Create New Voting</h3>
+            <div>
+                <label for="votingTitle">Voting Title:</label>
+                <input type="text" id="votingTitle" placeholder="Enter voting title" value="Sample Voting">
+            </div>
+            <div>
+                <label for="votingDescription">Description:</label>
+                <input type="text" id="votingDescription" placeholder="Enter description" value="This is a test voting">
+            </div>
+            <div>
+                <label for="votingDuration">Duration (in seconds):</label>
+                <input type="number" id="votingDuration" placeholder="Duration in seconds" min="60" value="300">
+            </div>
+            <button id="createVoting">Create Voting</button>
+        </div>
+
+        <div>
+            <h3>Active Votings</h3>
+            <button id="refreshVotings">Refresh Votings</button>
+            <div id="votingsList"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Status Messages</h2>
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        // Contract ABI definitions - simplified for demo
+        const votingRegistryABI = [
+            "function getVotingContracts() external view returns (address[] memory)",
+            "function getVotingsByContract(address votingContract) external view returns (uint256[] memory)",
+            "function addVotingContract(address votingContract) external",
+            "function removeVotingContract(address votingContract) external",
+            "function addVoting(address votingContract, uint256 votingId) external",
+            "function removeVoting(address votingContract, uint256 votingId) external"
+        ];
+
+        const erc20VotingTokenABI = [
+            "function balanceOf(address account) external view returns (uint256)",
+            "function approve(address spender, uint256 amount) external returns (bool)",
+            "function transfer(address recipient, uint256 amount) external returns (bool)",
+            "function transferFrom(address sender, address recipient, uint256 amount) external returns (bool)"
+        ];
+
+        const marketplaceABI = [
+            "function buyTokens(uint256 amount) external payable",
+            "function sellTokens(uint256 amount) external"
+        ];
+
+        const votingContractABI = [
+            "function createVoting(string memory title, string memory description, uint256 durationInSeconds) external returns (uint256)",
+            "function vote(uint256 votingId, bool inFavor) external",
+            "function getVoting(uint256 votingId) external view returns (string memory, string memory, uint256, uint256, uint256, bool)",
+            "function getActiveVotings() external view returns (uint256[] memory)",
+            "function hasVoted(address voter, uint256 votingId) external view returns (bool)"
+        ];
+
+        // Contract addresses - replace with your deployed addresses
+        const contractAddresses = {
+            votingRegistry: "0xA2A664898A5d1C2f073494f3331Dc14d0eb5202F",
+            erc20VotingToken: "0xc7f28950c5eE4b9b8B27dB1538803fcE4D620AD2",
+            marketplace: "0xa917948b20185AFEb998Fcb4546B6a42199F4E1C",
+            votingContract: "0x6E3EBdd7f53141d910DeC5264257b0F10Cd14E22"
+        };
+
+        // Global variables
+        let provider, signer, userAddress;
+        let votingRegistryContract, tokenContract, marketplaceContract, votingContract;
+
+        // Display contract addresses
+        document.getElementById('votingRegistryAddress').textContent = contractAddresses.votingRegistry;
+        document.getElementById('tokenAddress').textContent = contractAddresses.erc20VotingToken;
+        document.getElementById('marketplaceAddress').textContent = contractAddresses.marketplace;
+        document.getElementById('votingContractAddress').textContent = contractAddresses.votingContract;
+
+        // Connect wallet
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+
+        async function connectWallet() {
+            try {
+                // Check if MetaMask is installed
+                if (typeof window.ethereum === 'undefined') {
+                    updateStatus('Please install MetaMask!', 'error');
+                    return;
+                }
+
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                
+                // Setup ethers.js
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                
+                // Initialize contracts
+                votingRegistryContract = new ethers.Contract(contractAddresses.votingRegistry, votingRegistryABI, signer);
+                tokenContract = new ethers.Contract(contractAddresses.erc20VotingToken, erc20VotingTokenABI, signer);
+                marketplaceContract = new ethers.Contract(contractAddresses.marketplace, marketplaceABI, signer);
+                votingContract = new ethers.Contract(contractAddresses.votingContract, votingContractABI, signer);
+                
+                // Display wallet info
+                const network = await provider.getNetwork();
+                document.getElementById('walletInfo').textContent = `Connected: ${userAddress} (Network: ${network.name})`;
+                document.getElementById('walletInfo').className = 'status success';
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Update token balance
+                updateTokenBalance();
+                
+                // Load active votings
+                loadActiveVotings();
+                
+                updateStatus('Wallet connected successfully!', 'success');
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error connecting wallet: ' + error.message, 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('buyTokens').addEventListener('click', buyTokens);
+            document.getElementById('sellTokens').addEventListener('click', sellTokens);
+            document.getElementById('createVoting').addEventListener('click', createVoting);
+            document.getElementById('refreshVotings').addEventListener('click', loadActiveVotings);
+        }
+
+        async function updateTokenBalance() {
+            if (!userAddress || !tokenContract) return;
+            
+            try {
+                const balance = await tokenContract.balanceOf(userAddress);
+                document.getElementById('tokenBalance').textContent = ethers.utils.formatUnits(balance, 18);
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error updating token balance', 'error');
+            }
+        }
+
+        async function buyTokens() {
+            if (!userAddress || !marketplaceContract) {
+                updateStatus('Please connect wallet first', 'error');
+                return;
+            }
+            
+            try {
+                const amount = document.getElementById('buyAmount').value;
+                if (!amount || amount <= 0) {
+                    updateStatus('Please enter a valid amount', 'error');
+                    return;
+                }
+                
+                // 0.01 ETH per token for demonstration
+                const etherPrice = ethers.utils.parseEther((0.01 * amount).toString());
+                
+                const tx = await marketplaceContract.buyTokens(
+                    ethers.utils.parseUnits(amount, 18),
+                    { value: etherPrice }
+                );
+                
+                updateStatus('Buying tokens... Please wait for transaction confirmation.', 'success');
+                
+                await tx.wait();
+                updateStatus('Tokens purchased successfully!', 'success');
+                updateTokenBalance();
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error buying tokens: ' + error.message, 'error');
+            }
+        }
+
+        async function sellTokens() {
+            if (!userAddress || !marketplaceContract) {
+                updateStatus('Please connect wallet first', 'error');
+                return;
+            }
+            
+            try {
+                const amount = document.getElementById('sellAmount').value;
+                if (!amount || amount <= 0) {
+                    updateStatus('Please enter a valid amount', 'error');
+                    return;
+                }
+                
+                // Approve tokens for marketplace first
+                const approveTx = await tokenContract.approve(
+                    contractAddresses.marketplace,
+                    ethers.utils.parseUnits(amount, 18)
+                );
+                
+                updateStatus('Approving tokens... Please wait.', 'success');
+                await approveTx.wait();
+                
+                // Sell tokens
+                const tx = await marketplaceContract.sellTokens(ethers.utils.parseUnits(amount, 18));
+                
+                updateStatus('Selling tokens... Please wait for transaction confirmation.', 'success');
+                
+                await tx.wait();
+                updateStatus('Tokens sold successfully!', 'success');
+                updateTokenBalance();
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error selling tokens: ' + error.message, 'error');
+            }
+        }
+
+        async function createVoting() {
+            if (!userAddress || !votingContract) {
+                updateStatus('Please connect wallet first', 'error');
+                return;
+            }
+            
+            try {
+                const title = document.getElementById('votingTitle').value;
+                const description = document.getElementById('votingDescription').value;
+                const duration = document.getElementById('votingDuration').value;
+                
+                if (!title || !description || !duration) {
+                    updateStatus('Please fill all voting fields', 'error');
+                    return;
+                }
+                
+                const tx = await votingContract.createVoting(title, description, duration);
+                
+                updateStatus('Creating voting... Please wait for transaction confirmation.', 'success');
+                
+                await tx.wait();
+                updateStatus('Voting created successfully!', 'success');
+                loadActiveVotings();
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error creating voting: ' + error.message, 'error');
+            }
+        }
+
+        async function loadActiveVotings() {
+            if (!userAddress || !votingContract) {
+                updateStatus('Please connect wallet first', 'error');
+                return;
+            }
+            
+            try {
+                const activeVotingIds = await votingContract.getActiveVotings();
+                const votingListElement = document.getElementById('votingsList');
+                votingListElement.innerHTML = '';
+                
+                if (activeVotingIds.length === 0) {
+                    votingListElement.innerHTML = '<p>No active votings found.</p>';
+                    return;
+                }
+                
+                for (const votingId of activeVotingIds) {
+                    const voting = await votingContract.getVoting(votingId);
+                    const hasVoted = await votingContract.hasVoted(userAddress, votingId);
+                    
+                    const votingElement = document.createElement('div');
+                    votingElement.className = 'voting-item';
+                    
+                    const endTime = new Date(Number(voting[3]) * 1000);
+                    const inFavorVotes = Number(voting[4]);
+                    const againstVotes = Number(voting[5]);
+                    
+                    votingElement.innerHTML = `
+                        <h4>${voting[0]}</h4>
+                        <p>${voting[1]}</p>
+                        <p>Ends: ${endTime.toLocaleString()}</p>
+                        <p>Votes: ${inFavorVotes} in favor, ${againstVotes} against</p>
+                        ${hasVoted ? 
+                            '<p><strong>You have already voted</strong></p>' : 
+                            `<button onclick="castVote(${votingId}, true)">Vote In Favor</button>
+                             <button onclick="castVote(${votingId}, false)">Vote Against</button>`
+                        }
+                    `;
+                    
+                    votingListElement.appendChild(votingElement);
+                }
+                
+                updateStatus('Active votings loaded successfully', 'success');
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error loading votings: ' + error.message, 'error');
+            }
+        }
+
+        async function castVote(votingId, inFavor) {
+            if (!userAddress || !votingContract) {
+                updateStatus('Please connect wallet first', 'error');
+                return;
+            }
+            
+            try {
+                const tx = await votingContract.vote(votingId, inFavor);
+                
+                updateStatus(`Casting vote ${inFavor ? 'in favor' : 'against'}... Please wait.`, 'success');
+                
+                await tx.wait();
+                updateStatus('Vote cast successfully!', 'success');
+                loadActiveVotings();
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error casting vote: ' + error.message, 'error');
+            }
+        }
+
+        function updateStatus(message, type) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+
+        // Define the castVote function in the global scope
+        window.castVote = castVote;
+    </script>
+</body>
+</html>

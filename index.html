@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 авторизація</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .account-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Web3 авторизація</h1>
+        <p>Підключіть свій MetaMask гаманець для авторизації</p>
+        <button id="connectButton" class="btn">Увійти через Web3</button>
+        <div id="status" class="status"></div>
+        <div id="accountInfo" class="account-info">
+            <h2>Інформація про гаманець</h2>
+            <p>Адреса: <span id="accountAddress"></span></p>
+            <p>Мережа: <span id="networkName"></span></p>
+        </div>
+    </div>
+
+    <!-- Підключення JavaScript файлу -->
+    <script src="web3-auth.js"></script>
+</body>
+</html>
