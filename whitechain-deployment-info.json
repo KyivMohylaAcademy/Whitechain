@@ -1,0 +1,9 @@
+{
+  "votingRegistry": "0xA2A664898A5d1C2f073494f3331Dc14d0eb5202F",
+  "erc20VotingToken": "0xc7f28950c5eE4b9b8B27dB1538803fcE4D620AD2",
+  "marketplace": "0xa917948b20185AFEb998Fcb4546B6a42199F4E1C",
+  "votingContract": "0x6E3EBdd7f53141d910DeC5264257b0F10Cd14E22",
+  "network": "whitechain",
+  "deployer": "0xDaF5F9A78cF9d9E4130A668aA61AD3732C0fD84E",
+  "timestamp": "2025-04-29T22:13:03.275Z"
+}
