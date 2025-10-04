@@ -13,13 +13,18 @@ contract ItemNFT721 is ERC721, AccessControl {
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE"); // assign to CraftingSearch
     uint256 public nextId = 0;
 
-    enum ItemType {Saber, Staff, Armor, Bracelet}
+    enum ItemType {
+        Saber,
+        Staff,
+        Armor,
+        Bracelet
+    }
 
     struct Item {
         ItemType itemType;
     }
 
-    mapping (uint256 => Item) public items;
+    mapping(uint256 => Item) public items;
 
     /// @param admin Address that receives the admin role to manage minter and burner permissions.
     constructor(address admin) ERC721("Cossack Items", "CITEM") {
@@ -30,9 +35,7 @@ contract ItemNFT721 is ERC721, AccessControl {
     /// @param to Recipient of the newly minted item.
     /// @param itemType Item classification stored alongside the token ID.
     /// @return id Newly created token identifier.
-    function mintTo(
-        address to, ItemType itemType
-    ) external onlyRole(MINTER_ROLE) returns (uint256) {
+    function mintTo(address to, ItemType itemType) external onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 id = nextId;
 
         items[id] = Item(itemType);
@@ -52,9 +55,7 @@ contract ItemNFT721 is ERC721, AccessControl {
     /// @notice Checks interface support for ERC721 and AccessControl features.
     /// @param interfaceId Identifier of the interface to query.
     /// @return supported True if the contract supports the provided interface ID.
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

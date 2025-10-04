@@ -31,7 +31,7 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
     /// @notice Calculates the aggregate balance across all resource IDs for an account.
     /// @param account Address to query.
     /// @return balance Total quantity of all resources held by the account.
-    function totalBalanceOf(address account) external view returns (uint256){
+    function totalBalanceOf(address account) external view returns (uint256) {
         uint256 balance = 0;
 
         for (uint256 i = 0; i < resourceIds.length; i++) {
@@ -51,11 +51,7 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
     /// @param to Recipient of the resources.
     /// @param ids Identifiers of resources to mint.
     /// @param amounts Quantities to mint for each resource ID.
-    function mintBatch(
-        address to,
-        uint256[] calldata ids,
-        uint256[] calldata amounts
-    ) external onlyRole(MINTER_ROLE) {
+    function mintBatch(address to, uint256[] calldata ids, uint256[] calldata amounts) external onlyRole(MINTER_ROLE) {
         _mintBatch(to, ids, amounts, "");
     }
 
@@ -64,11 +60,10 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
     /// @param from Address whose resources will be burned.
     /// @param ids Identifiers of resources to burn.
     /// @param amounts Quantities to burn for each resource ID.
-    function burnBatch(
-        address from,
-        uint256[] calldata ids,
-        uint256[] calldata amounts
-    ) external onlyRole(BURNER_ROLE) {
+    function burnBatch(address from, uint256[] calldata ids, uint256[] calldata amounts)
+        external
+        onlyRole(BURNER_ROLE)
+    {
         _burnBatch(from, ids, amounts);
     }
 
@@ -81,9 +76,7 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
     }
 
     /// @inheritdoc ERC1155
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC1155, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC1155, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

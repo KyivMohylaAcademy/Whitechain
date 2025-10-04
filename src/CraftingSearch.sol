@@ -20,7 +20,7 @@ contract CraftingSearch is AccessControl {
 
     uint256 private nonce = 0;
 
-    mapping (address => uint256) public addressLastSearchTime;
+    mapping(address => uint256) public addressLastSearchTime;
 
     /// @param admin Address that receives the admin role controlling access permissions.
     /// @param _resources Resource contract that handles ERC1155 resource tokens.
@@ -40,7 +40,8 @@ contract CraftingSearch is AccessControl {
         uint256[] memory foundResourcesAmounts = new uint256[](foundResources.length);
 
         for (uint256 i = 0; i < SEARCH_RESULT_RESOURCE_COUNT; i++) {
-            uint256 foundResource = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce, i))) % foundResources.length;
+            uint256 foundResource =
+                uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce, i))) % foundResources.length;
             nonce++;
 
             foundResourcesAmounts[foundResource]++;
@@ -57,21 +58,25 @@ contract CraftingSearch is AccessControl {
     /// @param requiredResources Ordered array of resource IDs required to craft the item.
     /// @param requiredResourcesAmounts Quantities for each required resource ID.
     /// @return itemId Newly minted item token identifier.
-    function _craftItem(ItemNFT721.ItemType itemType, uint256[3] memory requiredResources, uint256[3] memory requiredResourcesAmounts) private returns (uint256) {
-            uint256[] memory burnResources = new uint256[](requiredResources.length);
-            uint256[] memory burnResourcesAmounts = new uint256[](requiredResources.length);
+    function _craftItem(
+        ItemNFT721.ItemType itemType,
+        uint256[3] memory requiredResources,
+        uint256[3] memory requiredResourcesAmounts
+    ) private returns (uint256) {
+        uint256[] memory burnResources = new uint256[](requiredResources.length);
+        uint256[] memory burnResourcesAmounts = new uint256[](requiredResources.length);
 
-            for (uint256 i = 0; i < requiredResources.length; i++) {
-                if (!(resources.balanceOf(msg.sender, requiredResources[i]) >= requiredResourcesAmounts[i])) {
-                    revert("Not enough recources to craft item");
-                }
-                burnResources[i] = requiredResources[i];
-                burnResourcesAmounts[i] = requiredResourcesAmounts[i];
+        for (uint256 i = 0; i < requiredResources.length; i++) {
+            if (!(resources.balanceOf(msg.sender, requiredResources[i]) >= requiredResourcesAmounts[i])) {
+                revert("Not enough recources to craft item");
             }
+            burnResources[i] = requiredResources[i];
+            burnResourcesAmounts[i] = requiredResourcesAmounts[i];
+        }
 
-            uint256 itemId = items.mintTo(msg.sender, itemType);
-            resources.burnBatch(msg.sender, burnResources, burnResourcesAmounts);
-            return itemId;
+        uint256 itemId = items.mintTo(msg.sender, itemType);
+        resources.burnBatch(msg.sender, burnResources, burnResourcesAmounts);
+        return itemId;
     }
 
     /// @notice Crafts an item by checking hard-coded recipes and burning the required resources.
