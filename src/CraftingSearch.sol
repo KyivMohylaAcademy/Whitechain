@@ -53,7 +53,24 @@ contract CraftingSearch is AccessControl {
     }
 
     /// @notice TODO: implement crafting according to recipes (burnBatch + mintTo).
-    function craft(uint256 /*itemType*/) external pure {
-        revert("TODO: implement craft()");
+    function craft(ItemNFT721.ItemType itemType) external {
+        if (itemType == ItemNFT721.ItemType.Saber) {
+            uint256[3] memory requiredResources = [resources.IRON(), resources.WOOD(), resources.LEATHER()];
+            uint256[3] memory requiredResourcesAmounts = [uint256(3), uint256(1), uint256(1)];
+
+            uint256[] memory burnResources = new uint256[](requiredResources.length);
+            uint256[] memory burnResourcesAmounts = new uint256[](requiredResources.length);
+
+            for (uint256 i = 0; i < requiredResources.length; i++) {
+                if (!(resources.balanceOf(msg.sender, requiredResources[i]) >= requiredResourcesAmounts[i])) {
+                    revert("Not enough recources to craft item");
+                }
+                burnResources[i] = requiredResources[i];
+                burnResourcesAmounts[i] = requiredResourcesAmounts[i];
+            }
+
+            items.mintTo(msg.sender, itemType);
+            resources.burnBatch(msg.sender, burnResources, burnResourcesAmounts);
+        }
     }
 }

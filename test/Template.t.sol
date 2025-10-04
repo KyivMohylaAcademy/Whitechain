@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 
 import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 import {ResourceNFT1155} from "../src/ResourceNFT1155.sol";
 import {ItemNFT721} from "../src/ItemNFT721.sol";
@@ -12,7 +13,7 @@ import {MagicToken} from "../src/MagicToken.sol";
 import {CraftingSearch} from "../src/CraftingSearch.sol";
 import {Marketplace} from "../src/Marketplace.sol";
 
-contract TemplateTest is Test, ERC1155Holder {
+contract TemplateTest is Test, ERC1155Holder, ERC721Holder {
     ResourceNFT1155 res;
     ItemNFT721 items;
     MagicToken magic;
@@ -71,5 +72,25 @@ contract TemplateTest is Test, ERC1155Holder {
         // assert correct number of resources
         uint256 resultResourceAmount = res.totalBalanceOf(address(this));
         assertTrue((initResourceAmount + 3) == resultResourceAmount, "Failed to recieve correct amount");
+    }
+
+    function test_craft() public {
+        vm.startPrank(address(cs));
+        res.mint(address(this), res.IRON(), 3);
+        res.mint(address(this), res.WOOD(), 1);
+        res.mint(address(this), res.LEATHER(), 1);
+        vm.stopPrank();
+
+        uint256 initResourceAmount = res.totalBalanceOf(address(this));
+        uint256 initItemCount = items.balanceOf(address(this));
+
+        cs.craft(ItemNFT721.ItemType.Saber);
+
+        // assert correct number of resources
+        uint256 resultResourceAmount = res.totalBalanceOf(address(this));
+        uint256 resultItemCount = items.balanceOf(address(this));
+
+        assertTrue((initResourceAmount - 5) == resultResourceAmount, "Resources were not burned");
+        assertTrue((initItemCount + 1) == resultItemCount, "Failed to recieve item");
     }
 }

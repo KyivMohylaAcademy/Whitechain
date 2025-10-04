@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
@@ -16,7 +16,15 @@ import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
  */
 contract ItemNFT721 is ERC721, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE"); // assign to CraftingSearch
-    uint256 public nextId = 1;
+    uint256 public nextId = 0;
+
+    enum ItemType {Saber, Staff, Armor, Bracelet}
+
+    struct Item {
+        ItemType itemType;
+    }
+
+    mapping (uint256 => Item) public items;
 
     constructor(address admin) ERC721("Cossack Items", "CITEM") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -24,12 +32,18 @@ contract ItemNFT721 is ERC721, AccessControl {
 
     /// @dev Template helper for future crafting (mint items).
     function mintTo(
-        address to
+        address to, ItemType itemType
     ) external onlyRole(MINTER_ROLE) returns (uint256) {
-        uint256 id = nextId++;
+        uint256 id = nextId;
+
+        items[id] = Item(itemType);
+
         _safeMint(to, id);
+        nextId++;
+
         return id;
     }
+
     function supportsInterface(
         bytes4 interfaceId
     ) public view override(ERC721, AccessControl) returns (bool) {

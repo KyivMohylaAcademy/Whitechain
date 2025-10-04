@@ -24,8 +24,11 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
     uint256 public constant WOOD = 0;
     uint256 public constant IRON = 1;
     uint256 public constant GOLD = 2;
+    uint256 public constant LEATHER = 3;
+    uint256 public constant STONE = 4;
+    uint256 public constant DIAMOND = 5;
 
-    uint256[] public resourceIds = [WOOD, IRON, GOLD];
+    uint256[] public resourceIds = [WOOD, IRON, GOLD, LEATHER, STONE, DIAMOND];
 
     function resourceIdsLength() external view returns (uint256) {
         return resourceIds.length;
@@ -65,6 +68,10 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
         uint256[] calldata amounts
     ) external onlyRole(BURNER_ROLE) {
         _burnBatch(from, ids, amounts);
+    }
+
+    function mint(address to, uint256 id, uint256 amount) external onlyRole(MINTER_ROLE) {
+        _mint(to, id, amount, "");
     }
 
     /// @inheritdoc ERC1155
