@@ -16,6 +16,7 @@ import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
  */
 contract ItemNFT721 is ERC721, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE"); // assign to CraftingSearch
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE"); // assign to CraftingSearch
     uint256 public nextId = 0;
 
     enum ItemType {Saber, Staff, Armor, Bracelet}
@@ -42,6 +43,10 @@ contract ItemNFT721 is ERC721, AccessControl {
         nextId++;
 
         return id;
+    }
+
+    function burn(uint256 tokenId) external onlyRole(BURNER_ROLE) {
+        _burn(tokenId);
     }
 
     function supportsInterface(

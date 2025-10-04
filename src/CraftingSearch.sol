@@ -53,7 +53,7 @@ contract CraftingSearch is AccessControl {
     }
 
     /// @notice TODO: implement crafting according to recipes (burnBatch + mintTo).
-    function craft(ItemNFT721.ItemType itemType) external {
+    function craft(ItemNFT721.ItemType itemType) external returns (uint256) {
         if (itemType == ItemNFT721.ItemType.Saber) {
             uint256[3] memory requiredResources = [resources.IRON(), resources.WOOD(), resources.LEATHER()];
             uint256[3] memory requiredResourcesAmounts = [uint256(3), uint256(1), uint256(1)];
@@ -69,8 +69,11 @@ contract CraftingSearch is AccessControl {
                 burnResourcesAmounts[i] = requiredResourcesAmounts[i];
             }
 
-            items.mintTo(msg.sender, itemType);
+            uint256 itemId = items.mintTo(msg.sender, itemType);
             resources.burnBatch(msg.sender, burnResources, burnResourcesAmounts);
+            return itemId;
         }
+
+        revert("Crafting of item is impossible");
     }
 }

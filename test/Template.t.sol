@@ -21,6 +21,7 @@ contract TemplateTest is Test, ERC1155Holder, ERC721Holder {
     Marketplace mkt;
 
     address admin = address(0xA11CE);
+    address otherAccount = address(0x123);
 
     function setUp() public {
         // set time
@@ -74,12 +75,16 @@ contract TemplateTest is Test, ERC1155Holder, ERC721Holder {
         assertTrue((initResourceAmount + 3) == resultResourceAmount, "Failed to recieve correct amount");
     }
 
-    function test_craft() public {
+    function _addResource(address to, uint256 resourceId, uint256 amount) private {
         vm.startPrank(address(cs));
-        res.mint(address(this), res.IRON(), 3);
-        res.mint(address(this), res.WOOD(), 1);
-        res.mint(address(this), res.LEATHER(), 1);
+        res.mint(to, resourceId, amount);
         vm.stopPrank();
+    }
+
+    function test_craft() public {
+        _addResource(address(this), res.IRON(), 3);
+        _addResource(address(this), res.WOOD(), 1);
+        _addResource(address(this), res.LEATHER(), 1);
 
         uint256 initResourceAmount = res.totalBalanceOf(address(this));
         uint256 initItemCount = items.balanceOf(address(this));
@@ -92,5 +97,100 @@ contract TemplateTest is Test, ERC1155Holder, ERC721Holder {
 
         assertTrue((initResourceAmount - 5) == resultResourceAmount, "Resources were not burned");
         assertTrue((initItemCount + 1) == resultItemCount, "Failed to recieve item");
+    }
+
+    function _craftItem(ItemNFT721.ItemType itemType) private returns (uint256) {
+        if (itemType == ItemNFT721.ItemType.Saber) {
+            _addResource(address(this), res.IRON(), 3);
+            _addResource(address(this), res.WOOD(), 1);
+            _addResource(address(this), res.LEATHER(), 1);
+
+            return cs.craft(ItemNFT721.ItemType.Saber);
+        } else if (itemType == ItemNFT721.ItemType.Staff) {
+            // TODO fix
+            vm.startPrank(address(cs));
+            res.mint(address(this), res.IRON(), 3);
+            res.mint(address(this), res.WOOD(), 1);
+            res.mint(address(this), res.LEATHER(), 1);
+            vm.stopPrank();
+
+            return cs.craft(ItemNFT721.ItemType.Saber);
+        }
+
+        revert("Requested item type is not supported");
+    }
+
+    function _addMagickTokens(address to, uint256 amount) private {
+        vm.startPrank(address(mkt));
+        magic.mint(to, amount);
+        vm.stopPrank();
+    }
+
+    function test_valid_listing() public {
+        uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
+
+        uint256 listingPrice = 100;
+        mkt.list(tokenId, listingPrice);
+
+        // assert correct listing
+        (address seller, uint256 price) = mkt.listings(tokenId);
+
+        assertTrue(seller == address(this), "Listing account is not valid");
+        assertTrue(price == listingPrice, "Listing price is not valid");
+    }
+
+    function test_invalid_listing() public {
+        uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
+
+        uint256 listingPrice = 100;
+
+        vm.startPrank(otherAccount);
+
+        vm.expectRevert("Sender must be owner of the token");
+        mkt.list(tokenId, listingPrice);
+
+        vm.startPrank(otherAccount);
+
+        // assert correct listing
+        (address seller, uint256 price) = mkt.listings(tokenId);
+
+        assertTrue(seller == address(0x0), "The listing was created from wrong account");
+        assertTrue(price == 0, "The listing was created from wrong account");
+    }
+
+    function test_valid_delisting() public {
+        uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
+
+        uint256 listingPrice = 100;
+        mkt.list(tokenId, listingPrice);
+
+        mkt.delist(tokenId);
+
+        // assert correct listing
+        (address seller, uint256 price) = mkt.listings(tokenId);
+
+        assertTrue(seller == address(0x0), "Listing was not delisted");
+        assertTrue(price == 0, "Listing was not delisted");
+    }
+
+    function test_invalid_delisting() public {
+        uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
+
+        uint256 listingPrice = 100;
+
+        mkt.list(tokenId, listingPrice);
+
+        vm.startPrank(otherAccount);
+
+        vm.expectRevert("Delisting can only be done by the seller");
+        mkt.delist(tokenId);
+
+        vm.startPrank(otherAccount);
+
+        // assert correct listing
+        (address seller, uint256 price) = mkt.listings(tokenId);
+
+        assertTrue(seller == address(this), "The listing was delisted from wrong account");
+        assertTrue(price == listingPrice, "The listing was delisted from wrong account");
     }
 }
