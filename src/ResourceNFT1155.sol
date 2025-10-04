@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
@@ -21,7 +21,29 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
      * @notice Example of resourse definition.
      *
      */
-    uint256 public constant WOOD = 1;
+    uint256 public constant WOOD = 0;
+    uint256 public constant IRON = 1;
+    uint256 public constant GOLD = 2;
+
+    uint256[] public resourceIds = [WOOD, IRON, GOLD];
+
+    function resourceIdsLength() external view returns (uint256) {
+        return resourceIds.length;
+    }
+
+    function getResourceIds() external view returns (uint256[] memory) {
+        return resourceIds;
+    }
+
+    function totalBalanceOf(address account) external view returns (uint256){
+        uint256 balance = 0;
+
+        for (uint256 i = 0; i < resourceIds.length; i++) {
+            balance += balanceOf(account, resourceIds[i]);
+        }
+
+        return balance;
+    }
 
     constructor(address admin) ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);

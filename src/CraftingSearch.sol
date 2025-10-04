@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ResourceNFT1155} from "./ResourceNFT1155.sol";
@@ -20,7 +20,12 @@ contract CraftingSearch is AccessControl {
     ItemNFT721 public items;
 
     // Optional constant for your cooldown if you need it later
-    uint256 public constant SEARCH_COOLDOWN = 60;
+    uint256 public constant SEARCH_COOLDOWN = 60 seconds;
+    uint256 public constant SEARCH_RESULT_RESOURCE_COUNT = 3;
+
+    uint256 private nonce = 0;
+
+    mapping (address => uint256) public addressLastSearchTime;
 
     constructor(address admin, ResourceNFT1155 _resources, ItemNFT721 _items) {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -29,8 +34,22 @@ contract CraftingSearch is AccessControl {
     }
 
     /// @notice TODO: implement resource search (cooldown + mintBatch on ResourceNFT1155).
-    function search() external pure {
-        revert("TODO: implement search()");
+    function search() external {
+        require(addressLastSearchTime[msg.sender] < (block.timestamp - SEARCH_COOLDOWN), "Cooldown did not ended");
+
+        uint256[] memory foundResources = resources.getResourceIds();
+        uint256[] memory foundResourcesAmounts = new uint256[](foundResources.length);
+
+        for (uint256 i = 0; i < SEARCH_RESULT_RESOURCE_COUNT; i++) {
+            uint256 foundResource = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce, i))) % foundResources.length;
+            nonce++;
+
+            foundResourcesAmounts[foundResource]++;
+        }
+
+        resources.mintBatch(msg.sender, foundResources, foundResourcesAmounts);
+
+        addressLastSearchTime[msg.sender] = block.timestamp;
     }
 
     /// @notice TODO: implement crafting according to recipes (burnBatch + mintTo).

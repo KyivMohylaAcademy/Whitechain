@@ -2,6 +2,9 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
+import {console} from "forge-std/console.sol";
+
+import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 import {ResourceNFT1155} from "../src/ResourceNFT1155.sol";
 import {ItemNFT721} from "../src/ItemNFT721.sol";
@@ -9,7 +12,7 @@ import {MagicToken} from "../src/MagicToken.sol";
 import {CraftingSearch} from "../src/CraftingSearch.sol";
 import {Marketplace} from "../src/Marketplace.sol";
 
-contract TemplateTest is Test {
+contract TemplateTest is Test, ERC1155Holder {
     ResourceNFT1155 res;
     ItemNFT721 items;
     MagicToken magic;
@@ -19,6 +22,9 @@ contract TemplateTest is Test {
     address admin = address(0xA11CE);
 
     function setUp() public {
+        // set time
+        vm.warp(1_700_000_000);
+
         res = new ResourceNFT1155(admin);
         items = new ItemNFT721(admin);
         magic = new MagicToken(admin);
@@ -53,4 +59,17 @@ contract TemplateTest is Test {
     // - search() cooldown + 3 random ERC1155 mints
     // - craft() recipes: burn ERC1155 + mint ERC721
     // - marketplace listing + purchase: burn ERC721 + mint MAGIC to seller
+
+    function test_search() public {
+        uint256 initResourceAmount = res.totalBalanceOf(address(this));
+        cs.search();
+
+        // assert cooldown works
+        vm.expectRevert("Cooldown did not ended");
+        cs.search();
+
+        // assert correct number of resources
+        uint256 resultResourceAmount = res.totalBalanceOf(address(this));
+        assertTrue((initResourceAmount + 3) == resultResourceAmount, "Failed to recieve correct amount");
+    }
 }
