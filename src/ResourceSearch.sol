@@ -4,15 +4,6 @@ import "./Resource.sol";
 
 contract ResourceSearch {
 
-    enum Type {
-        WOOD,
-        IRON,
-        STONE,
-        LEATHER,
-        GOLD,
-        DIMOND
-    }
-
     uint64 public constant SEARCH_PERIOD_SECONDS = 60;
     uint8 public constant RESOURCES_FARMED_PER_SEARCH = 3;
 
@@ -55,7 +46,7 @@ contract ResourceSearch {
         for(uint i=0; i<RESOURCES_FARMED_PER_SEARCH; i++) {
             // NOT SECURE, CAN BE CALCULATED
             uint256 pseudoRandomNumber = uint256(keccak256(abi.encodePacked(timestamp, sender, blockPrevrandao, i)));
-            types[i] = pseudoRandomNumber % (uint256(type(Type).max) + 1);
+            types[i] = pseudoRandomNumber % (uint256(type(Resource.Type).max) + 1);
             values[i] = 1;
         }
         

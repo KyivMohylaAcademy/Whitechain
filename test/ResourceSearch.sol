@@ -28,10 +28,10 @@ contract ResourceSearchTest is Test {
      */
     function contractRandomResourceDistribution(address sender, uint256 timestamp, uint256 blockPrevrandao)
          internal pure returns (uint256[] memory) {
-        uint256[] memory foundResources = new uint256[](uint256(type(ResourceSearch.Type).max) + 1);
+        uint256[] memory foundResources = new uint256[](uint256(type(Resource.Type).max) + 1);
         for(uint i=0; i < RESOURCES_FARMED_PER_SEARCH; i++) {
             uint256 pseudoRandomNumber = uint256(keccak256(abi.encodePacked(timestamp, sender, blockPrevrandao, i)));
-            uint256 resourceIndex = pseudoRandomNumber % (uint256(type(ResourceSearch.Type).max) + 1);
+            uint256 resourceIndex = pseudoRandomNumber % (uint256(type(Resource.Type).max) + 1);
             foundResources[resourceIndex] += 1;
         }
         
