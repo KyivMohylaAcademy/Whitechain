@@ -5,7 +5,12 @@ import {BaseTest} from "./Base.t.sol";
 
 import {ItemNFT721} from "../src/ItemNFT721.sol";
 
+/**
+ * @title MarketplaceTest
+ * @notice Tests Marketplace burn-for-reward behavior and authorization checks.
+ */
 contract MarketplaceTest is BaseTest {
+    /// @notice Verifies that selling burns the NFT and credits Magic tokens.
     function test_valid_selling() public {
         uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
 
@@ -21,6 +26,7 @@ contract MarketplaceTest is BaseTest {
         assertTrue((initMagicBalance + mkt.MAGIC_AMOUNT()) == resultMagicBalance, "Magic was not added");
     }
 
+    /// @notice Ensures non-owners cannot sell and balances remain unchanged.
     function test_invalid_selling() public {
         uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
 

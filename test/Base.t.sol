@@ -12,6 +12,10 @@ import {MagicToken} from "../src/MagicToken.sol";
 import {CraftingSearch} from "../src/CraftingSearch.sol";
 import {Marketplace} from "../src/Marketplace.sol";
 
+/**
+ * @title BaseTest
+ * @notice Shared fixture for unit tests, deploying contracts and wiring role assignments.
+ */
 contract BaseTest is Test, ERC1155Holder, ERC721Holder {
     ResourceNFT1155 res;
     ItemNFT721 items;
@@ -22,6 +26,7 @@ contract BaseTest is Test, ERC1155Holder, ERC721Holder {
     address admin = address(0xA11CE);
     address otherAccount = address(0x123);
 
+    /// @notice Deploys contracts, sets the block timestamp, and configures cross-contract roles.
     function setUp() public {
         // set time
         vm.warp(1_700_000_000);
@@ -42,6 +47,7 @@ contract BaseTest is Test, ERC1155Holder, ERC721Holder {
         vm.stopPrank();
     }
 
+    /// @notice Verifies that deployment succeeded and expected roles are assigned.
     function test_deployed_and_roles_wired() public view {
         // contracts deployed
         assertTrue(address(res) != address(0));
@@ -57,12 +63,19 @@ contract BaseTest is Test, ERC1155Holder, ERC721Holder {
         assertTrue(magic.hasRole(magic.MARKET_ROLE(), address(mkt)));
     }
 
+    /// @dev Helper that mints resources to an address by impersonating the crafting contract.
+    /// @param to Recipient of the resources.
+    /// @param resourceId Identifier of the resource to mint.
+    /// @param amount Quantity of the resource to mint.
     function _addResource(address to, uint256 resourceId, uint256 amount) internal {
         vm.startPrank(address(cs));
         res.mint(to, resourceId, amount);
         vm.stopPrank();
     }
 
+    /// @dev Crafts an item of the requested type by seeding prerequisite resources and invoking CraftingSearch.
+    /// @param itemType Item variant to craft.
+    /// @return tokenId Identifier of the crafted item.
     function _craftItem(ItemNFT721.ItemType itemType) internal returns (uint256) {
         if (itemType == ItemNFT721.ItemType.Saber) {
             _addResource(address(this), res.IRON(), 3);

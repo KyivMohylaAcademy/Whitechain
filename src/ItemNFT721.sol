@@ -5,14 +5,8 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
- * @title ItemNFT721 (Template)
- * @notice Minimal ERC721 with role-gated mint. No metadata, no burn yet.
- *
- * TODO :
- * - If you need Marketplace-driven burn, consider a safe pattern:
- *   * either implement a custom burn that the Marketplace can call
- *     (requires careful authorization), or
- *   * transfer-to-Marketplace then Marketplace burns as owner.
+ * @title ItemNFT721
+ * @notice ERC721 collection for crafted items with role-restricted minting and burning.
  */
 contract ItemNFT721 is ERC721, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE"); // assign to CraftingSearch
@@ -27,11 +21,15 @@ contract ItemNFT721 is ERC721, AccessControl {
 
     mapping (uint256 => Item) public items;
 
+    /// @param admin Address that receives the admin role to manage minter and burner permissions.
     constructor(address admin) ERC721("Cossack Items", "CITEM") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
     }
 
-    /// @dev Template helper for future crafting (mint items).
+    /// @notice Mints an item NFT with the provided type to the target address.
+    /// @param to Recipient of the newly minted item.
+    /// @param itemType Item classification stored alongside the token ID.
+    /// @return id Newly created token identifier.
     function mintTo(
         address to, ItemType itemType
     ) external onlyRole(MINTER_ROLE) returns (uint256) {
@@ -45,10 +43,15 @@ contract ItemNFT721 is ERC721, AccessControl {
         return id;
     }
 
+    /// @notice Burns an existing item token when called by an authorized burner.
+    /// @param tokenId Identifier of the token to destroy.
     function burn(uint256 tokenId) external onlyRole(BURNER_ROLE) {
         _burn(tokenId);
     }
 
+    /// @notice Checks interface support for ERC721 and AccessControl features.
+    /// @param interfaceId Identifier of the interface to query.
+    /// @return supported True if the contract supports the provided interface ID.
     function supportsInterface(
         bytes4 interfaceId
     ) public view override(ERC721, AccessControl) returns (bool) {

@@ -6,14 +6,8 @@ import {ItemNFT721} from "./ItemNFT721.sol";
 import {MagicToken} from "./MagicToken.sol";
 
 /**
- * @title Marketplace (Template)
- * @notice Minimal wiring only. No listings or purchase logic yet.
- *
- * TODO :
- * - Implement listing storage (tokenId => (seller, price)).
- * - Implement purchase:
- *   * (spec) burn item on sale and mint MagicToken to seller
- *   * or transfer then burn with a safe authorization flow
+ * @title Marketplace
+ * @notice Marketplace that lets item owners burn their tokens for a fixed MagicToken reward.
  */
 contract Marketplace is AccessControl {
     ItemNFT721 public items;
@@ -21,12 +15,17 @@ contract Marketplace is AccessControl {
 
     uint256 public constant MAGIC_AMOUNT = 100;
 
+    /// @param admin Address that receives the admin role for managing marketplace permissions.
+    /// @param _items Contract that manages the item NFTs being sold.
+    /// @param _magic ERC20 token contract used to reward sellers.
     constructor(address admin, ItemNFT721 _items, MagicToken _magic) {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         items = _items;
         magic = _magic;
     }
 
+    /// @notice Allows an item owner to burn their token in exchange for a flat MagicToken payout.
+    /// @param tokenId Identifier of the item being sold and burned.
     function sell(uint256 tokenId) external {
         require(msg.sender == items.ownerOf(tokenId), "Only owner can sell token");
 

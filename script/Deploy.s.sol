@@ -10,9 +10,12 @@ import {CraftingSearch} from "../src/CraftingSearch.sol";
 import {Marketplace} from "../src/Marketplace.sol";
 
 /**
- * @dev Minimal deploy only. Grants core roles but leaves business rules to you.
+ * @title Deploy
+ * @notice Foundry script that deploys the core contracts and grants cross-contract roles.
+ * @dev Broadcasts using the PRIVATE_KEY env var and logs deployed addresses.
  */
 contract Deploy is Script {
+    /// @notice Deploys contracts, wires permissions, and emits addresses to the console.
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(pk);

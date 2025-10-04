@@ -6,14 +6,9 @@ import {ResourceNFT1155} from "./ResourceNFT1155.sol";
 import {ItemNFT721} from "./ItemNFT721.sol";
 
 /**
- * @title CraftingSearch (Template)
- * @notice Minimal wiring only. No randomness, no recipes. You will implement logic.
- *
- * TODO:
- * - Implement `search()` with a 60s cooldown that mints 3 random resources via ResourceNFT1155.
- * - Define recipe storage and implement `craft()`:
- *   * burn resources in ResourceNFT1155
- *   * mint item in ItemNFT721
+ * @title CraftingSearch
+ * @notice Coordinates resource searching with a cooldown and crafts items by burning resources.
+ * @dev Uses pseudo-randomness based on block data to mint resources and hard-coded recipes for crafting.
  */
 contract CraftingSearch is AccessControl {
     ResourceNFT1155 public resources;
@@ -27,13 +22,17 @@ contract CraftingSearch is AccessControl {
 
     mapping (address => uint256) public addressLastSearchTime;
 
+    /// @param admin Address that receives the admin role controlling access permissions.
+    /// @param _resources Resource contract that handles ERC1155 resource tokens.
+    /// @param _items Item contract that handles ERC721 crafted items.
     constructor(address admin, ResourceNFT1155 _resources, ItemNFT721 _items) {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         resources = _resources;
         items = _items;
     }
 
-    /// @notice TODO: implement resource search (cooldown + mintBatch on ResourceNFT1155).
+    /// @notice Allows a player to search for resources after the cooldown and mints random materials.
+    /// @dev Generates pseudo-random resource IDs using block data and tracks per-address cooldowns.
     function search() external {
         require(addressLastSearchTime[msg.sender] < (block.timestamp - SEARCH_COOLDOWN), "Cooldown did not ended");
 
@@ -52,6 +51,12 @@ contract CraftingSearch is AccessControl {
         addressLastSearchTime[msg.sender] = block.timestamp;
     }
 
+    /// @dev Burns the required resources and mints the crafted item for the caller using prepared recipes;
+    ///      reverts if the caller lacks any required amount.
+    /// @param itemType Type of item being crafted.
+    /// @param requiredResources Ordered array of resource IDs required to craft the item.
+    /// @param requiredResourcesAmounts Quantities for each required resource ID.
+    /// @return itemId Newly minted item token identifier.
     function _craftItem(ItemNFT721.ItemType itemType, uint256[3] memory requiredResources, uint256[3] memory requiredResourcesAmounts) private returns (uint256) {
             uint256[] memory burnResources = new uint256[](requiredResources.length);
             uint256[] memory burnResourcesAmounts = new uint256[](requiredResources.length);
@@ -69,7 +74,11 @@ contract CraftingSearch is AccessControl {
             return itemId;
     }
 
-    /// @notice TODO: implement crafting according to recipes (burnBatch + mintTo).
+    /// @notice Crafts an item by checking hard-coded recipes and burning the required resources.
+    /// @dev Uses predefined recipes for each supported item type and calls `_craftItem` to mint NFTs;
+    ///      unspecified types default to zeroed recipes, effectively minting without burning.
+    /// @param itemType Type of item to craft.
+    /// @return tokenId Identifier of the newly crafted item.
     function craft(ItemNFT721.ItemType itemType) external returns (uint256) {
         uint256[3] memory requiredResources;
         uint256[3] memory requiredResourcesAmounts;
