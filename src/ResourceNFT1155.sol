@@ -30,10 +30,6 @@ contract ResourceNFT1155 is ERC1155, AccessControl {
 
     uint256[] public resourceIds = [WOOD, IRON, GOLD, LEATHER, STONE, DIAMOND];
 
-    function resourceIdsLength() external view returns (uint256) {
-        return resourceIds.length;
-    }
-
     function getResourceIds() external view returns (uint256[] memory) {
         return resourceIds;
     }

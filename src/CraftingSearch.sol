@@ -52,12 +52,7 @@ contract CraftingSearch is AccessControl {
         addressLastSearchTime[msg.sender] = block.timestamp;
     }
 
-    /// @notice TODO: implement crafting according to recipes (burnBatch + mintTo).
-    function craft(ItemNFT721.ItemType itemType) external returns (uint256) {
-        if (itemType == ItemNFT721.ItemType.Saber) {
-            uint256[3] memory requiredResources = [resources.IRON(), resources.WOOD(), resources.LEATHER()];
-            uint256[3] memory requiredResourcesAmounts = [uint256(3), uint256(1), uint256(1)];
-
+    function _craftItem(ItemNFT721.ItemType itemType, uint256[3] memory requiredResources, uint256[3] memory requiredResourcesAmounts) private returns (uint256) {
             uint256[] memory burnResources = new uint256[](requiredResources.length);
             uint256[] memory burnResourcesAmounts = new uint256[](requiredResources.length);
 
@@ -72,8 +67,27 @@ contract CraftingSearch is AccessControl {
             uint256 itemId = items.mintTo(msg.sender, itemType);
             resources.burnBatch(msg.sender, burnResources, burnResourcesAmounts);
             return itemId;
+    }
+
+    /// @notice TODO: implement crafting according to recipes (burnBatch + mintTo).
+    function craft(ItemNFT721.ItemType itemType) external returns (uint256) {
+        uint256[3] memory requiredResources;
+        uint256[3] memory requiredResourcesAmounts;
+
+        if (itemType == ItemNFT721.ItemType.Saber) {
+            requiredResources = [resources.IRON(), resources.WOOD(), resources.LEATHER()];
+            requiredResourcesAmounts = [uint256(3), uint256(1), uint256(1)];
+        } else if (itemType == ItemNFT721.ItemType.Staff) {
+            requiredResources = [resources.WOOD(), resources.GOLD(), resources.DIAMOND()];
+            requiredResourcesAmounts = [uint256(2), uint256(1), uint256(1)];
+        } else if (itemType == ItemNFT721.ItemType.Armor) {
+            requiredResources = [resources.LEATHER(), resources.IRON(), resources.GOLD()];
+            requiredResourcesAmounts = [uint256(4), uint256(2), uint256(1)];
+        } else if (itemType == ItemNFT721.ItemType.Bracelet) {
+            requiredResources = [resources.IRON(), resources.GOLD(), resources.DIAMOND()];
+            requiredResourcesAmounts = [uint256(4), uint256(2), uint256(2)];
         }
 
-        revert("Crafting of item is impossible");
+        return _craftItem(itemType, requiredResources, requiredResourcesAmounts);
     }
 }
