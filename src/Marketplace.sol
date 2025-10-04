@@ -19,12 +19,7 @@ contract Marketplace is AccessControl {
     ItemNFT721 public items;
     MagicToken public magic;
 
-    struct Listing {
-        address seller;
-        uint256 price;
-    }
-
-    mapping (uint256 => Listing) public listings;
+    uint256 public constant MAGIC_AMOUNT = 100;
 
     constructor(address admin, ItemNFT721 _items, MagicToken _magic) {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -32,26 +27,10 @@ contract Marketplace is AccessControl {
         magic = _magic;
     }
 
-    function list(uint256 tokenId, uint256 price) external {
-        require(items.ownerOf(tokenId) == msg.sender, "Sender must be owner of the token");
-        listings[tokenId] = Listing(msg.sender, price);
-    }
+    function sell(uint256 tokenId) external {
+        require(msg.sender == items.ownerOf(tokenId), "Only owner can sell token");
 
-    function delist(uint256 tokenId) external {
-        Listing memory listing = listings[tokenId];
-        require(listing.seller == msg.sender, "Delisting can only be done by the seller");
-
-        delete listings[tokenId];
-    }
-
-    function purchase(uint256 tokenId) external {
-        Listing memory listing = listings[tokenId];
-        require(listing.seller != address(0), "The token is not listed for sale");
-        require(items.ownerOf(tokenId) == listing.seller, "The seller is no longer the owner of the token");
-
-        require(magic.balanceOf(msg.sender) >= listing.price, "Not enough MagicTokens for purchase");
-
-        magic.transferFrom(msg.sender, listing.seller, listing.price);
+        magic.mint(msg.sender, MAGIC_AMOUNT);
         items.burn(tokenId);
     }
 }

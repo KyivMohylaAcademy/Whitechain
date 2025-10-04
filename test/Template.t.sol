@@ -38,6 +38,7 @@ contract TemplateTest is Test, ERC1155Holder, ERC721Holder {
         res.grantRole(res.MINTER_ROLE(), address(cs));
         res.grantRole(res.BURNER_ROLE(), address(cs));
         items.grantRole(items.MINTER_ROLE(), address(cs));
+        items.grantRole(items.BURNER_ROLE(), address(mkt));
         magic.grantRole(magic.MARKET_ROLE(), address(mkt));
         vm.stopPrank();
     }
@@ -120,77 +121,38 @@ contract TemplateTest is Test, ERC1155Holder, ERC721Holder {
         revert("Requested item type is not supported");
     }
 
-    function _addMagickTokens(address to, uint256 amount) private {
-        vm.startPrank(address(mkt));
-        magic.mint(to, amount);
-        vm.stopPrank();
-    }
-
-    function test_valid_listing() public {
+    function test_valid_selling() public {
         uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
 
-        uint256 listingPrice = 100;
-        mkt.list(tokenId, listingPrice);
+        uint256 initItemBalance = items.balanceOf(address(this));
+        uint256 initMagicBalance = magic.balanceOf(address(this));
 
-        // assert correct listing
-        (address seller, uint256 price) = mkt.listings(tokenId);
+        mkt.sell(tokenId);
 
-        assertTrue(seller == address(this), "Listing account is not valid");
-        assertTrue(price == listingPrice, "Listing price is not valid");
+        uint256 resultItemBalance = items.balanceOf(address(this));
+        uint256 resultMagicBalance = magic.balanceOf(address(this));
+
+        assertTrue((initItemBalance - 1) == resultItemBalance, "Item was not burned");
+        assertTrue((initMagicBalance + mkt.MAGIC_AMOUNT()) == resultMagicBalance, "Magic was not added");
     }
 
-    function test_invalid_listing() public {
+    function test_invalid_selling() public {
         uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
 
-        uint256 listingPrice = 100;
+        uint256 initItemBalance = items.balanceOf(address(this));
+        uint256 initMagicBalance = magic.balanceOf(address(this));
 
         vm.startPrank(otherAccount);
 
-        vm.expectRevert("Sender must be owner of the token");
-        mkt.list(tokenId, listingPrice);
+        vm.expectRevert("Only owner can sell token");
+        mkt.sell(tokenId);
 
         vm.startPrank(otherAccount);
 
-        // assert correct listing
-        (address seller, uint256 price) = mkt.listings(tokenId);
+        uint256 resultItemBalance = items.balanceOf(address(this));
+        uint256 resultMagicBalance = magic.balanceOf(address(this));
 
-        assertTrue(seller == address(0x0), "The listing was created from wrong account");
-        assertTrue(price == 0, "The listing was created from wrong account");
-    }
-
-    function test_valid_delisting() public {
-        uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
-
-        uint256 listingPrice = 100;
-        mkt.list(tokenId, listingPrice);
-
-        mkt.delist(tokenId);
-
-        // assert correct listing
-        (address seller, uint256 price) = mkt.listings(tokenId);
-
-        assertTrue(seller == address(0x0), "Listing was not delisted");
-        assertTrue(price == 0, "Listing was not delisted");
-    }
-
-    function test_invalid_delisting() public {
-        uint256 tokenId = _craftItem(ItemNFT721.ItemType.Saber);
-
-        uint256 listingPrice = 100;
-
-        mkt.list(tokenId, listingPrice);
-
-        vm.startPrank(otherAccount);
-
-        vm.expectRevert("Delisting can only be done by the seller");
-        mkt.delist(tokenId);
-
-        vm.startPrank(otherAccount);
-
-        // assert correct listing
-        (address seller, uint256 price) = mkt.listings(tokenId);
-
-        assertTrue(seller == address(this), "The listing was delisted from wrong account");
-        assertTrue(price == listingPrice, "The listing was delisted from wrong account");
+        assertTrue(initItemBalance == resultItemBalance, "Item was burned from the wrong account");
+        assertTrue(initMagicBalance == resultMagicBalance, "Magic was added from the wrong account");
     }
 }
