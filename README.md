@@ -1,80 +1,66 @@
-Whitechain
-Введення
-Дане тестове завдання було підготовлено компанією WhiteBIT для студентів
-університету НаУКМА. Це завдання дає змогу компанії оцінити аналітичні,
-технічні та архітектурні навички кандидатів.
-Вимоги до коду
-Код має бути виконаний на версії Solidity = 0.8.24, також він має бути
-задеплоєний і верифікований у мережу Whitechain Testnet.
-Має бути 100% покриття тестами свого контракту, і задеплоєно за
-допомогою Hardhat або Foundry, скрипти мають бути написані на TypeScript. 
-Коментарі до коду мають відповідати формату natSpec. 
-Має бути доданий README файл з адресами задеплоєних контрактів, на ньому мають бути
-виконані крафт речей, і всі інструкції для того, щоб задеплоїти проєкт. 
-Посилання на pull request викласти на Distedu.
-Використання таких бібліотек є необов’язковим, та за
-бажанням студента:
-UUPSUpgradeable
-Initializable
-AccessControl
-Та й інші
-Завдання: Гра “Козацький бізнес”
-У грі існує 6 базових ресурсів NFT1155:
-• Дерево (Wood)
-• Залізо (Iron)
-• Золото (Gold)
-• Шкіра (Leather)
-• Камінь (Stone)
-• Алмаз (Diamond)
-Гравці можуть об’єднувати ресурси та створювати унікальні предмети NFT721:
-1. Шабля козака
-• 3× Залізо
-• 1× Дерево
-• 1× Шкіра
-2. Посох старійшини
-• 2× Дерево
-• 1× Золото
-• 1× Алмаз
-3. Броня характерника (не обовʼязково)
-• 4× Шкіра
-• 2× Залізо
-• 1× Золото
-4. Бойовий браслет (не обовʼязково)
-• 4× Залізо
-• 2× Золото
-• 2× Алмаз
-Механіка NFT-1155 / NFT721:
-Створення NFT можливе лише через контракти Crafting або Search.
-Пряме створення або спалення NFT через базові контракти ResourceNFT1155 та
-ItemNFT721 — заборонене.
-Спалення NFT можливе тільки під час продажу предметів у контракті Marketplace.
-Механіка MagicToken (ERC20):
-Токени MagicToken можна отримати лише через продаж предметів у контракті
-Marketplace.
-Пряме мінтинг токенів через контракт MagicToken заборонений. Мінт викликається
-виключно з Marketplace.
-Отримані MagicToken надходять на гаманець гравця після успішного продажу
-предмета.
-Механіка Crafting / Search:
-Гравець може запускати пошук ресурсів раз на 60 секунд.
-Пошук генерує 3 випадкових ресурси (ResourceNFT1155), які надходять на
-гаманець гравця.
-Для створення предмета (ItemNFT721) через крафт, гравець повинен мати
-необхідну кількість ресурсів.
-Під час крафту:
-Ресурси спалюються.
-Створюється предмет (NFT721) з унікальним ID.
-Створені предмети можна:
-продавати на Marketplace,
-або передавати іншим гравцям.
-Механіка Marketplace:
-Гравці можуть продавати предмети (NFT721) за MagicToken.
-Після купівлі предмета:
-NFT спалюється.
-Продавець отримує відповідну кількість MagicToken на свій гаманець.
-Контракти:
-ResourceNFT1155
-ItemNFT721 (2-4шт)
-Crafting/Search
-Marketplace
-MagicToken (ERC20)
+## Foundry
+
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+
+Foundry consists of:
+
+- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+
+## Documentation
+
+https://book.getfoundry.sh/
+
+## Usage
+
+### Build
+
+```shell
+$ forge build
+```
+
+### Test
+
+```shell
+$ forge test
+```
+
+### Format
+
+```shell
+$ forge fmt
+```
+
+### Gas Snapshots
+
+```shell
+$ forge snapshot
+```
+
+### Anvil
+
+```shell
+$ anvil
+```
+
+### Deploy
+
+```shell
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+
+### Cast
+
+```shell
+$ cast <subcommand>
+```
+
+### Help
+
+```shell
+$ forge --help
+$ anvil --help
+$ cast --help
+```
