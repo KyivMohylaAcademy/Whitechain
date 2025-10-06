@@ -6,6 +6,7 @@ import {Resource} from "./Resource.sol";
 
 contract Item is ERC721("Item", "IM"), Ownable {
     enum Type {
+        NONE,
         SABLE,
         ELDERS_STICK,
         ARMOUR,
@@ -32,6 +33,10 @@ contract Item is ERC721("Item", "IM"), Ownable {
     function marketTransfer(address from, address to, uint256 tokenId) external {
         require(msg.sender == _marketplaceContract && _marketplaceContract != address(0));
         _update(to, tokenId, from);
+    }
+
+    function getType(uint256 id) external view returns (Type) {
+        return _itemToType[id];
     }
 
     function setItemCraftingContract(address itemCraftingContract) external onlyOwner {

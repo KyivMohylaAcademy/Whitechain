@@ -11,7 +11,7 @@ contract Resource is ERC1155, Ownable {
         STONE,
         LEATHER,
         GOLD,
-        DIMOND
+        DIAMOND
     }
 
     address private _resourceSearchContract;

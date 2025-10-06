@@ -203,4 +203,10 @@ contract ItemTest is Test {
         
         assertEq(item.ownerOf(1), recipient);
     }
+
+
+    function testUnknowIdReturnsNoneType() public {
+        vm.prank(user1);
+        assertEq(uint256(item.getType(42)), uint256(Item.Type.NONE));
+    }
 }

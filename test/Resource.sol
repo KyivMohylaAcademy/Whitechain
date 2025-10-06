@@ -89,7 +89,7 @@ contract ResourceTest is Test {
         ids[2] = uint256(Resource.Type.STONE);
         ids[3] = uint256(Resource.Type.LEATHER);
         ids[4] = uint256(Resource.Type.GOLD);
-        ids[5] = uint256(Resource.Type.DIMOND);
+        ids[5] = uint256(Resource.Type.DIAMOND);
         values[0] = 10;
         values[1] = 20;
         values[2] = 30;
@@ -105,7 +105,7 @@ contract ResourceTest is Test {
         assertEq(resource.balanceOf(user1, uint256(Resource.Type.STONE)), 30);
         assertEq(resource.balanceOf(user1, uint256(Resource.Type.LEATHER)), 40);
         assertEq(resource.balanceOf(user1, uint256(Resource.Type.GOLD)), 50);
-        assertEq(resource.balanceOf(user1, uint256(Resource.Type.DIMOND)), 60);
+        assertEq(resource.balanceOf(user1, uint256(Resource.Type.DIAMOND)), 60);
     }
 
     function test_MintBatch_MultipleMints_Accumulate() public {
@@ -499,7 +499,7 @@ contract ResourceTest is Test {
         // Mint resources to user1
         uint256[] memory ids = new uint256[](1);
         uint256[] memory values = new uint256[](1);
-        ids[0] = uint256(Resource.Type.DIMOND);
+        ids[0] = uint256(Resource.Type.DIAMOND);
         values[0] = 100;
         
         vm.prank(resourceSearch);
@@ -507,10 +507,10 @@ contract ResourceTest is Test {
         
         // User1 transfers to user2 (standard ERC1155 transfer)
         vm.prank(user1);
-        resource.safeTransferFrom(user1, user2, uint256(Resource.Type.DIMOND), 40, "");
+        resource.safeTransferFrom(user1, user2, uint256(Resource.Type.DIAMOND), 40, "");
         
-        assertEq(resource.balanceOf(user1, uint256(Resource.Type.DIMOND)), 60);
-        assertEq(resource.balanceOf(user2, uint256(Resource.Type.DIMOND)), 40);
+        assertEq(resource.balanceOf(user1, uint256(Resource.Type.DIAMOND)), 60);
+        assertEq(resource.balanceOf(user2, uint256(Resource.Type.DIAMOND)), 40);
     }
 
     // === Fuzz Tests ===
