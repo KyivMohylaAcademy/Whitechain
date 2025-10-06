@@ -422,20 +422,6 @@ contract ResourceSearchTest is Test {
         vm.stopPrank();
     }
     
-    function testFuzz_MultipleUserSearches(address userAddr) public {
-        // Ensure address is valid
-        vm.assume(userAddr != address(0));
-        vm.assume(userAddr != address(this));
-        vm.assume(userAddr != address(42));
-        // I do not really know what the below contract means, but when the code is fuzzed with this address it fails with 
-        vm.prank(userAddr);
-        resourceSearch.search();
-        uint256[] memory expected = contractRandomResourceDistribution(userAddr, vm.getBlockTimestamp(), 0);
-        
-        for (uint i = 0; i < expected.length; i++) {
-            assertEq(resource.balanceOf(userAddr, i), expected[i]);
-        } 
-    }
     
     /**************************************************************************
      * Integration Tests

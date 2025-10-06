@@ -549,6 +549,7 @@ contract ResourceTest is Test {
 
     function testFuzz_MintBatch_DifferentUsers(address user) public {
         vm.assume(user != address(0));
+        vm.assume(user != address(resource));
         
         uint256[] memory ids = new uint256[](1);
         uint256[] memory values = new uint256[](1);

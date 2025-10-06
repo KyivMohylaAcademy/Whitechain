@@ -251,6 +251,12 @@ contract ItemCraftingTest is Test {
         assertEq(resourceContract.balanceOf(user1, uint256(Resource.Type.LEATHER)), 4);
     }
     
+    function test_revertAttemptToCraftNoneItem() public {
+        vm.prank(user1);
+        vm.expectRevert();
+        crafting.craftItem(Item.Type.NONE);
+    }
+
     // Test: Verify correct resource amounts are burned for each item type
     function testResourceBurningForAllItems() public {
         // Test SABLE: 3 iron, 1 wood, 1 leather

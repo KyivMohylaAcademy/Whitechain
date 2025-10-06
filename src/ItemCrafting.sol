@@ -67,9 +67,6 @@ contract ItemCrafting {
             resourceValues[2] = 2;
             return (resourcesForCraft, resourceValues);
         }
-
-        // we should never be there, otherwise contract does not work
-        assert(false);
     }
     
 }

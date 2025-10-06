@@ -24,10 +24,10 @@ contract Item is ERC721("Item", "IM"), Ownable {
     }
 
     function mintItem(address crafter, Type typ) external {
-        require(msg.sender == _itemCraftingContract && _itemCraftingContract != address(0));
-        uint256 itemId = _itemIdCounter++;
-        _mint(crafter, itemId);
-        _itemToType[itemId] = typ;
+        require(_itemCraftingContract != address(0) && msg.sender == _itemCraftingContract);
+        _mint(crafter, _itemIdCounter);
+        _itemToType[_itemIdCounter] = typ;
+        _itemIdCounter++;
     }
 
     function marketTransfer(address from, address to, uint256 tokenId) external {

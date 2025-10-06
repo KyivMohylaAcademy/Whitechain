@@ -20,7 +20,7 @@ contract Marketplace {
         // i.e. having zero price (not being for sale), or having non-zero price (being for sale)
         // zero price 'sell' may be put into transfer mechanism with limitation of that we need to specify receiver
         require(magicTokensValue != 0);
-        Item itemContract = Item(_magicCoinsContract);
+        Item itemContract = Item(_itemContract);
         require(itemContract.ownerOf(itemId) == msg.sender || itemContract.getApproved(itemId) == msg.sender);
         itemsToSell[itemId] = magicTokensValue;
     }

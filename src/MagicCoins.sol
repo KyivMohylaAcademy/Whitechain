@@ -18,7 +18,6 @@ contract MagicCoins is ERC20, Ownable {
         _burn(from, value);
     }
 
-
     function setMarketContract(address marketContract) external onlyOwner {
         _marketContract = marketContract;
     }
