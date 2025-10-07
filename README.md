@@ -1,3 +1,39 @@
+# Results
+
+## Contract addresses
+Resource contract - ```0xf74282E8ff92Ca707E2CE4a61Efc94De8bcBdac8```
+Items contract - ```0x03628E913dfA97B57c5175d592bB085cF0C447a1```
+Magic coins contract - ```0x8a2f4bFaC07aEdF3188213e82Bc373B53B78B96c```
+Item crafting contract - ```0xc677D087C3686d2bB0BbD9Da74Ba90035C3cDDE2```
+Marketplace contract - ```0x2358aBdFB3DB90f6D49C638320514215e00537d3```
+Resource search contract - ```0x7CC43CE10D575AF279058233e63BFD0A3C9495D7```
+
+## How to deploy
+1. Create .env file and put there INITIAL_OWNER={YOUR_ADDRESS}
+2. Enter `forge script --legacy --chain 2625 script/DeployScript.sol:DeployScript --rpc-url https://rpc-testnet.whitechain.io --broadcast --verify -vvvv --interactives 1` to deploy into white chain testnet (you can remove --rpc-url in order to test).
+3. Interactive shell will ask for private key of the wallet which initiates and pays for deployment. Provide it.
+
+## Test coverage
+```
+╭-------------------------+------------------+------------------+-----------------+----------------╮
+| File                    | % Lines          | % Statements     | % Branches      | % Funcs        |
++==================================================================================================+
+| src/Item.sol            | 100.00% (16/16)  | 100.00% (10/10)  | 100.00% (4/4)   | 100.00% (6/6)  |
+|-------------------------+------------------+------------------+-----------------+----------------|
+| src/ItemCrafting.sol    | 100.00% (51/51)  | 100.00% (56/56)  | 100.00% (6/6)   | 100.00% (3/3)  |
+|-------------------------+------------------+------------------+-----------------+----------------|
+| src/MagicCoins.sol      | 100.00% (8/8)    | 100.00% (5/5)    | 100.00% (4/4)   | 100.00% (3/3)  |
+|-------------------------+------------------+------------------+-----------------+----------------|
+| src/Marketplace.sol     | 100.00% (22/22)  | 100.00% (19/19)  | 100.00% (8/8)   | 100.00% (4/4)  |
+|-------------------------+------------------+------------------+-----------------+----------------|
+| src/Resource.sol        | 100.00% (10/10)  | 100.00% (6/6)    | 100.00% (4/4)   | 100.00% (4/4)  |
+|-------------------------+------------------+------------------+-----------------+----------------|
+| src/ResourceSearch.sol  | 100.00% (21/21)  | 100.00% (23/23)  | 100.00% (2/2)   | 100.00% (4/4)  |
+|-------------------------+------------------+------------------+-----------------+----------------|
+| Total                   | 100.00% (128/128)| 100.00% (119/119)| 100.00% (28/28) | 92.31% (24/26) |
+╰-------------------------+------------------+------------------+-----------------+----------------╯
+```
+
 # Вимоги до коду 
 1. Solidity = 0.8.24
 2. Deployed and verified in whitechain TestNet
@@ -34,11 +70,3 @@
 15. Contracts: ResourceNFT1155 ItemNFT721 (2-4)
 16. magic token (ERC-20)
 17. Crafting search, marketplace
-
-
-## Magic tokens
-1. ERC-20
-2. Magic tokens can be obtained only via Marketplace contract selling items, direct minting is forbidden.
-3. Magic tokens appear in the wallet of seller
-
-## Resources
