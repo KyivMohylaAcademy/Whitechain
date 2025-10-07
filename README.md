@@ -1,11 +1,11 @@
 # Results
 
-## Contract addresses
-Resource contract - ```0xf74282E8ff92Ca707E2CE4a61Efc94De8bcBdac8```
-Items contract - ```0x03628E913dfA97B57c5175d592bB085cF0C447a1```
-Magic coins contract - ```0x8a2f4bFaC07aEdF3188213e82Bc373B53B78B96c```
-Item crafting contract - ```0xc677D087C3686d2bB0BbD9Da74Ba90035C3cDDE2```
-Marketplace contract - ```0x2358aBdFB3DB90f6D49C638320514215e00537d3```
+## Contract addresses`
+Resource contract - ```0xf74282E8ff92Ca707E2CE4a61Efc94De8bcBdac8```<br>
+Items contract - ```0x03628E913dfA97B57c5175d592bB085cF0C447a1```<br>
+Magic coins contract - ```0x8a2f4bFaC07aEdF3188213e82Bc373B53B78B96c```<br>
+Item crafting contract - ```0xc677D087C3686d2bB0BbD9Da74Ba90035C3cDDE2```<br>
+Marketplace contract - ```0x2358aBdFB3DB90f6D49C638320514215e00537d3```<br>
 Resource search contract - ```0x7CC43CE10D575AF279058233e63BFD0A3C9495D7```
 
 ## How to deploy
