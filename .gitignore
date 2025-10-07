@@ -10,5 +10,13 @@ out/
 # Docs
 docs/
 
+# remix artifacts
+artifacts/
+.deps/
+
+#broadcast info
+broadcast/
+
 # Dotenv file
 .env
+
