@@ -1,11 +1,11 @@
 # Solidity whitechain homework
 
 ## Deployed contract addresses
-- ResourceNFT1155 - [https://testnet.whitechain.io/address/0x9caad6eFcf9c7A09B94c5cDD480A6F22bc04e918](0x9caad6eFcf9c7A09B94c5cDD480A6F22bc04e918)
-- ItemNFT721 - [https://testnet.whitechain.io/address/0x656E515135a34880CFb3C5eA44ECdB19155CDB49](0x656E515135a34880CFb3C5eA44ECdB19155CDB49)
-- MagicToken - [https://testnet.whitechain.io/address/0xEE9B0ac0b8368c043aEc6D244C5aC1Bd64aff866](0xEE9B0ac0b8368c043aEc6D244C5aC1Bd64aff866)
-- CraftingSearch - [https://testnet.whitechain.io/address/0x642484d87B49Bee57bE0CC89fA4E6B6e869Da22e](0x642484d87B49Bee57bE0CC89fA4E6B6e869Da22e)
-- Marketplace - [https://testnet.whitechain.io/address/0x117EC1227Bad0eB37C8A2C15b51695F5A5D0CCc4](0x117EC1227Bad0eB37C8A2C15b51695F5A5D0CCc4)
+- ResourceNFT1155 - [0x9caad6eFcf9c7A09B94c5cDD480A6F22bc04e918](https://testnet.whitechain.io/address/0x9caad6eFcf9c7A09B94c5cDD480A6F22bc04e918)
+- ItemNFT721 - [0x656E515135a34880CFb3C5eA44ECdB19155CDB49](https://testnet.whitechain.io/address/0x656E515135a34880CFb3C5eA44ECdB19155CDB49)
+- MagicToken - [0xEE9B0ac0b8368c043aEc6D244C5aC1Bd64aff866](https://testnet.whitechain.io/address/0xEE9B0ac0b8368c043aEc6D244C5aC1Bd64aff866)
+- CraftingSearch - [0x642484d87B49Bee57bE0CC89fA4E6B6e869Da22e](https://testnet.whitechain.io/address/0x642484d87B49Bee57bE0CC89fA4E6B6e869Da22e)
+- Marketplace - [0x117EC1227Bad0eB37C8A2C15b51695F5A5D0CCc4](https://testnet.whitechain.io/address/0x117EC1227Bad0eB37C8A2C15b51695F5A5D0CCc4)
 
 ## How to deploy
 1. Add rpc url and private key to .env file
