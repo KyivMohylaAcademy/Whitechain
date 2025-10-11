@@ -22,4 +22,15 @@ contract MagicToken is ERC20, AccessControl {
     function mint(address to, uint256 amount) external onlyRole(MARKET_ROLE) {
         _mint(to, amount);
     }
+
+    /// @notice Burns tokens from an account, spending allowance when required.
+    /// @param from Account whose tokens will be destroyed.
+    /// @param amount Number of tokens to burn.
+    function burnFrom(address from, uint256 amount) external onlyRole(MARKET_ROLE) {
+        if (from != _msgSender()) {
+            _spendAllowance(from, _msgSender(), amount);
+        }
+
+        _burn(from, amount);
+    }
 }

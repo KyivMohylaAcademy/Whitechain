@@ -60,6 +60,7 @@ contract BaseTest is Test, ERC1155Holder, ERC721Holder {
         assertTrue(res.hasRole(res.MINTER_ROLE(), address(cs)));
         assertTrue(res.hasRole(res.BURNER_ROLE(), address(cs)));
         assertTrue(items.hasRole(items.MINTER_ROLE(), address(cs)));
+        assertTrue(items.hasRole(items.BURNER_ROLE(), address(mkt)));
         assertTrue(magic.hasRole(magic.MARKET_ROLE(), address(mkt)));
     }
 
