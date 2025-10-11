@@ -1,4 +1,4 @@
-# Solidity whitechain homework
+# Solidity Whitechain Homework
 
 ## Deployed contract addresses
 - ResourceNFT1155 - [0x9caad6eFcf9c7A09B94c5cDD480A6F22bc04e918](https://testnet.whitechain.io/address/0x9caad6eFcf9c7A09B94c5cDD480A6F22bc04e918)
@@ -8,7 +8,7 @@
 - Marketplace - [0x117EC1227Bad0eB37C8A2C15b51695F5A5D0CCc4](https://testnet.whitechain.io/address/0x117EC1227Bad0eB37C8A2C15b51695F5A5D0CCc4)
 
 ## How to deploy
-1. Add rpc url and private key to .env file
+1. Add RPC URL and private key to .env file
 2. Source .env file:
 ```sh
 source .env
@@ -19,9 +19,9 @@ source .env
 forge script script/Deploy.s.sol:Deploy --rpc-url $WHITECHAIN_RPC_URL --broadcast --legacy
 ```
 
-4. Get json input for verification:
+4. Get JSON input for verification:
 ```sh
-forge verify-contract --chain 2625 --show-standard-json-input <contract-address> <path-to-contract-sorce-code>
+forge verify-contract --chain 2625 --show-standard-json-input <contract-address> <path-to-contract-source-code>
 ```
 
 ## Test coverage
@@ -53,9 +53,9 @@ Ran 6 test suites in 9.00ms (22.97ms CPU time): 25 tests passed, 0 failed, 0 ski
 ╰-------------------------+-------------------+-------------------+-----------------+-----------------╯
 ```
 
-## Funcionality
+## Functionality
 1. Game has 6 resources: Wood, Iron, Gold, Leather, Stone, Diamond.
-2. It allows to search for these resources with a 60 second cooldown and grants 3 random drops per search.
+2. It allows searching for these resources with a 60-second cooldown and grants 3 random drops per search.
 3. Resource contract supports the ERC1155 standard with role-gated minting and burning.
 4. Item contract supports the ERC721 standard, minting Saber, Staff, Armor, and Bracelet NFTs via controlled roles.
 5. Magic token contract supports the ERC20 standard with marketplace-restricted mint and burn helpers.
